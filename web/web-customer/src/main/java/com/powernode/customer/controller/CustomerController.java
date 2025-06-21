@@ -1,7 +1,9 @@
 package com.powernode.customer.controller;
 
+import com.powernode.common.annotation.PowerLogin;
 import com.powernode.common.constant.RedisConstant;
 import com.powernode.common.result.Result;
+import com.powernode.common.util.AuthContextHolder;
 import com.powernode.customer.service.CustomerService;
 import com.powernode.model.vo.customer.CustomerLoginVo;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,13 +34,19 @@ public class CustomerController {
 
 
 
+    @PowerLogin
     @Operation(summary = "获取客户登录信息")
     @GetMapping("/getCustomerLoginInfo")
     public Result<CustomerLoginVo> getCustomerLoginInfo(@RequestHeader("token") String token) {
 
-        String customerId = stringRedisTemplate.opsForValue().get(RedisConstant.USER_LOGIN_KEY_PREFIX + token);
+        //String customerId = stringRedisTemplate.opsForValue().get(RedisConstant.USER_LOGIN_KEY_PREFIX + token);
 
-        return Result.ok(customerService.getCustomerLoginInfo(Long.parseLong(customerId)));
+        //从threadLocal中获取用户id
+        Long userId = AuthContextHolder.getUserId();
+        //删除threadLocal中存储的userId 防止内存泄漏
+        AuthContextHolder.removeUserId();
+
+        return Result.ok(customerService.getCustomerLoginInfo(userId));
     }
 }
 
