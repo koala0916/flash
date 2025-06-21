@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: service-order
+  cloud:
+    nacos:
+      config:
+        file-extension: yaml
+        prefix: ${spring.application.name}
+        server-addr: localhost:8848
+        shared-configs:
+          - data-id: common-account.yaml
+      discovery:
+        server-addr: localhost:8848
+  main:
+    allow-bean-definition-overriding: true
+  profiles:
+    active: dev
