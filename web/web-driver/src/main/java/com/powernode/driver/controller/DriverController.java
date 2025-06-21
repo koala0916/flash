@@ -1,7 +1,10 @@
 package com.powernode.driver.controller;
 
+import com.powernode.common.annotation.PowerLogin;
 import com.powernode.common.result.Result;
+import com.powernode.common.util.AuthContextHolder;
 import com.powernode.driver.service.DriverService;
+import com.powernode.model.vo.driver.DriverLoginVo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
@@ -25,6 +28,16 @@ public class DriverController {
     @GetMapping("/login/{code}")
     public Result<String> login(@PathVariable String code){
         return Result.ok(driverService.login(code));
+    }
+
+    @PowerLogin
+    @Operation(summary = "获取配送员登录信息")
+    @GetMapping("/getDriverLoginInfo")
+    public Result<DriverLoginVo> getDriverLoginInfo(){
+       //从ThreadLocal中获取配送员的id
+        Long userId = AuthContextHolder.getUserId();
+
+        return Result.ok(driverService.getDriverLoginVo(userId));
     }
 }
 

@@ -3,9 +3,9 @@ package com.powernode.driver.service.impl;
 
 import com.powernode.driver.client.DriverInfoFeignClient;
 import com.powernode.driver.service.DriverService;
+import com.powernode.model.vo.driver.DriverLoginVo;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.annotation.ReadOnlyProperty;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -36,5 +36,16 @@ public class DriverServiceImpl implements DriverService {
         stringRedisTemplate.opsForValue().set(RedisConstant.USER_LOGIN_KEY_PREFIX + token,driverId.toString(),RedisConstant.USER_LOGIN_KEY_TIMEOUT, TimeUnit.SECONDS);
 
         return token;
+    }
+
+
+    /**
+     * 获取配送员登录信息
+     * @param driverId
+     * @return
+     */
+    @Override
+    public DriverLoginVo getDriverLoginVo(Long driverId) {
+       return driverInfoFeignClient.getDriverLoginInfo(driverId).getData();
     }
 }

@@ -15,9 +15,11 @@ import com.powernode.model.entity.driver.DriverAccount;
 import com.powernode.model.entity.driver.DriverInfo;
 import com.powernode.model.entity.driver.DriverLoginLog;
 import com.powernode.model.entity.driver.DriverSet;
+import com.powernode.model.vo.driver.DriverLoginVo;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.error.WxErrorException;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -87,4 +89,23 @@ public class DriverInfoServiceImpl extends ServiceImpl<DriverInfoMapper, DriverI
         }
     }
 
+
+    /**
+     * 获取配送员信息
+     */
+
+    @Override
+    public DriverLoginVo getDriverLoginVo(Long driverId) {
+        DriverInfo driverInfo = getById(driverId);
+
+        DriverLoginVo driverLoginVo = new DriverLoginVo();
+        BeanUtils.copyProperties(driverInfo, driverLoginVo);
+
+        //判断是否创建人脸库
+        boolean isArchiveFace = driverInfo.getFaceModelId() != null;
+
+        driverLoginVo.setIsArchiveFace(isArchiveFace);
+
+        return driverLoginVo;
+    }
 }
