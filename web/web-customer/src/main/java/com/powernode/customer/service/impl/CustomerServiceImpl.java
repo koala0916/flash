@@ -6,6 +6,7 @@ import com.powernode.common.execption.PowerException;
 import com.powernode.common.result.Result;
 import com.powernode.customer.client.CustomerInfoFeignClient;
 import com.powernode.customer.service.CustomerService;
+import com.powernode.model.form.customer.UpdateWxPhoneForm;
 import com.powernode.model.vo.customer.CustomerLoginVo;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -62,4 +63,15 @@ public class CustomerServiceImpl implements CustomerService {
         return result.getData();
     }
 
+    @Override
+    public Boolean updateWxPhoneNumber(UpdateWxPhoneForm updateWxPhoneForm){
+
+        Result<Boolean> booleanResult = customerInfoFeignClient.updateWxPhoneNumber(updateWxPhoneForm);
+
+        if (booleanResult.getCode().intValue() != 200) {
+            throw new PowerException(booleanResult.getCode(), booleanResult.getMessage());
+        }
+
+        return booleanResult.getData();
+    }
 }

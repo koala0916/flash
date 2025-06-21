@@ -5,6 +5,7 @@ import com.powernode.common.constant.RedisConstant;
 import com.powernode.common.result.Result;
 import com.powernode.common.util.AuthContextHolder;
 import com.powernode.customer.service.CustomerService;
+import com.powernode.model.form.customer.UpdateWxPhoneForm;
 import com.powernode.model.vo.customer.CustomerLoginVo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -47,6 +48,15 @@ public class CustomerController {
         AuthContextHolder.removeUserId();
 
         return Result.ok(customerService.getCustomerLoginInfo(userId));
+    }
+
+
+    @Operation(summary = "更新客户微信手机号码")
+    @PostMapping("/updateWxPhone")
+    public Result<Boolean> updateWxPhoneNumber(@RequestBody UpdateWxPhoneForm updateWxPhoneForm) {
+        //Boolean b = customerService.updateWxPhoneNumber(updateWxPhoneForm);
+        //个人开发者获取不到手机号，这里只是让流程跑通
+        return Result.ok(true);
     }
 }
 

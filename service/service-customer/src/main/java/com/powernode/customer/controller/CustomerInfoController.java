@@ -4,14 +4,12 @@ package com.powernode.customer.controller;
 import com.powernode.common.result.Result;
 import com.powernode.customer.service.CustomerInfoService;
 import com.powernode.model.entity.customer.CustomerInfo;
+import com.powernode.model.form.customer.UpdateWxPhoneForm;
 import com.powernode.model.vo.customer.CustomerLoginVo;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
@@ -40,6 +38,13 @@ public class CustomerInfoController {
 	@GetMapping("/getCustomerLoginInfo/{customerId}")
 	public Result<CustomerLoginVo> getCustomerLoginInfo(@PathVariable Long customerId) {
 		return Result.ok(customerInfoService.getCustomerLoginInfo(customerId));
+	}
+
+
+	@Operation(summary = "更新客户微信手机号码")
+	@PostMapping("/updateWxPhoneNumber")
+	public Result<Boolean> updateWxPhoneNumber(@RequestBody UpdateWxPhoneForm updateWxPhoneForm) {
+		return Result.ok(customerInfoService.updateWxPhoneNumber(updateWxPhoneForm));
 	}
 }
 

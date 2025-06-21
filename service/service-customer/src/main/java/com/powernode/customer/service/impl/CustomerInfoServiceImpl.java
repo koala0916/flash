@@ -3,6 +3,7 @@ package com.powernode.customer.service.impl;
 
 import cn.binarywang.wx.miniapp.api.WxMaService;
 import cn.binarywang.wx.miniapp.bean.WxMaJscode2SessionResult;
+import cn.binarywang.wx.miniapp.bean.WxMaPhoneNumberInfo;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.powernode.customer.mapper.CustomerInfoMapper;
@@ -10,6 +11,7 @@ import com.powernode.customer.mapper.CustomerLoginLogMapper;
 import com.powernode.customer.service.CustomerInfoService;
 import com.powernode.model.entity.customer.CustomerInfo;
 import com.powernode.model.entity.customer.CustomerLoginLog;
+import com.powernode.model.form.customer.UpdateWxPhoneForm;
 import com.powernode.model.vo.customer.CustomerLoginVo;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -93,5 +95,26 @@ public class CustomerInfoServiceImpl extends ServiceImpl<CustomerInfoMapper, Cus
         customerLoginVo.setIsBindPhone(isBindingPhone);
 
         return customerLoginVo;
+    }
+
+
+    @Override
+    public Boolean updateWxPhoneNumber(UpdateWxPhoneForm updateWxPhoneForm){
+        try {
+            //利用微信接口获取用户授权的手机号
+            WxMaPhoneNumberInfo phoneNoInfo = wxMaService.getUserService().getPhoneNoInfo(updateWxPhoneForm.getCode());
+            //获取手机号  但是我们个人号无法获取
+            String phoneNumber = phoneNoInfo.getPhoneNumber();
+
+            //将手机号存入数据库
+            CustomerInfo customerInfo = new CustomerInfo();
+            customerInfo.setId(updateWxPhoneForm.getCustomerId());
+            customerInfo.setPhone(phoneNumber);
+
+            return updateById(customerInfo);
+
+        } catch (WxErrorException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
