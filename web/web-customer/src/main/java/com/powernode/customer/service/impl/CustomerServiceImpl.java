@@ -56,9 +56,9 @@ public class CustomerServiceImpl implements CustomerService {
     public CustomerLoginVo getCustomerLoginInfo(Long customerId){
         Result<CustomerLoginVo> result = customerInfoFeignClient.getCustomerLoginInfo(customerId);
 
-        if (result.getCode().intValue() != 200) {
-            throw new PowerException(result.getCode(), result.getMessage());
-        }
+//        if (result.getCode().intValue() != 200) {
+//            throw new PowerException(result.getCode(), result.getMessage());
+//        }
 
         return result.getData();
     }
@@ -68,9 +68,9 @@ public class CustomerServiceImpl implements CustomerService {
 
         Result<Boolean> booleanResult = customerInfoFeignClient.updateWxPhoneNumber(updateWxPhoneForm);
 
-        if (booleanResult.getCode().intValue() != 200) {
-            throw new PowerException(booleanResult.getCode(), booleanResult.getMessage());
-        }
+//        if (booleanResult.getCode().intValue() != 200) {
+//            throw new PowerException(booleanResult.getCode(), booleanResult.getMessage());
+//        }
 
         return booleanResult.getData();
     }
