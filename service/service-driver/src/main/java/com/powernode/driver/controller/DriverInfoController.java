@@ -2,6 +2,7 @@ package com.powernode.driver.controller;
 
 import com.powernode.common.result.Result;
 import com.powernode.driver.service.DriverInfoService;
+import com.powernode.model.vo.driver.DriverAuthInfoVo;
 import com.powernode.model.vo.driver.DriverLoginVo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -34,6 +35,13 @@ public class DriverInfoController {
     @GetMapping("/getDriverLoginInfo/{driverId}")
     public Result<DriverLoginVo> getDriverLoginInfo(@PathVariable Long driverId){
         return Result.ok(driverInfoService.getDriverLoginVo(driverId));
+    }
+
+
+    @Operation(summary = "获取配送员认证信息")
+    @GetMapping("/getDriverAuthInfo/{driverId}")
+    public Result<DriverAuthInfoVo> getDriverAuthInfo(@PathVariable Long driverId){
+        return Result.ok(driverInfoService.getDriverAuthInfo(driverId));
     }
 }
 

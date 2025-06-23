@@ -4,6 +4,7 @@ import com.powernode.common.annotation.PowerLogin;
 import com.powernode.common.result.Result;
 import com.powernode.common.util.AuthContextHolder;
 import com.powernode.driver.service.DriverService;
+import com.powernode.model.vo.driver.DriverAuthInfoVo;
 import com.powernode.model.vo.driver.DriverLoginVo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -38,6 +39,16 @@ public class DriverController {
         Long userId = AuthContextHolder.getUserId();
 
         return Result.ok(driverService.getDriverLoginVo(userId));
+    }
+
+
+    @Operation(summary = "获取配送员认证信息")
+    @PowerLogin
+    @GetMapping("/getDriverAuthInfo")
+    public Result<DriverAuthInfoVo> getDriverAuthInfo(){
+        Long driverId = AuthContextHolder.getUserId();
+
+        return Result.ok(driverService.getDriverAuthInfo(driverId));
     }
 }
 

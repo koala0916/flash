@@ -10,11 +10,13 @@ import com.powernode.driver.mapper.DriverAccountMapper;
 import com.powernode.driver.mapper.DriverInfoMapper;
 import com.powernode.driver.mapper.DriverLoginLogMapper;
 import com.powernode.driver.mapper.DriverSetMapper;
+import com.powernode.driver.service.CosService;
 import com.powernode.driver.service.DriverInfoService;
 import com.powernode.model.entity.driver.DriverAccount;
 import com.powernode.model.entity.driver.DriverInfo;
 import com.powernode.model.entity.driver.DriverLoginLog;
 import com.powernode.model.entity.driver.DriverSet;
+import com.powernode.model.vo.driver.DriverAuthInfoVo;
 import com.powernode.model.vo.driver.DriverLoginVo;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -41,6 +43,9 @@ public class DriverInfoServiceImpl extends ServiceImpl<DriverInfoMapper, DriverI
 
     @Resource
     private DriverLoginLogMapper driverLoginLogMapper;
+
+    @Resource
+    private CosService cosService;
 
     @Transactional
     @Override
@@ -108,4 +113,24 @@ public class DriverInfoServiceImpl extends ServiceImpl<DriverInfoMapper, DriverI
 
         return driverLoginVo;
     }
+
+    /**
+     * 查询配送员认证信息
+     */
+    @Override
+    public DriverAuthInfoVo getDriverAuthInfo(Long driverId) {
+        DriverInfo driverInfo = getById(driverId);
+        DriverAuthInfoVo driverAuthInfoVo = new DriverAuthInfoVo();
+
+        BeanUtils.copyProperties(driverInfo, driverAuthInfoVo);
+
+        driverAuthInfoVo.setDriverId(driverId);
+
+        //获取回显地址，我们的回显地址是有过期时间的
+        driverAuthInfoVo.setIdcardBackShowUrl(cosService.getImageUrl(driverInfo.getIdcardBackUrl()));
+        driverAuthInfoVo.setIdcardFrontShowUrl(cosService.getImageUrl(driverInfo.getIdcardFrontUrl()));
+
+        return driverAuthInfoVo;
+    }
+
 }

@@ -1,6 +1,7 @@
 package com.powernode.driver.client;
 
 import com.powernode.common.result.Result;
+import com.powernode.model.vo.driver.DriverAuthInfoVo;
 import com.powernode.model.vo.driver.DriverLoginVo;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,4 +16,7 @@ public interface DriverInfoFeignClient {
 
     @GetMapping("/driver/info/getDriverLoginInfo/{driverId}")
     Result<DriverLoginVo> getDriverLoginInfo(@PathVariable Long driverId);
+
+    @GetMapping("/driver/info/getDriverAuthInfo/{driverId}")
+    Result<DriverAuthInfoVo> getDriverAuthInfo(@PathVariable Long driverId);
 }
