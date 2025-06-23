@@ -16,6 +16,7 @@ import com.powernode.model.entity.driver.DriverAccount;
 import com.powernode.model.entity.driver.DriverInfo;
 import com.powernode.model.entity.driver.DriverLoginLog;
 import com.powernode.model.entity.driver.DriverSet;
+import com.powernode.model.form.driver.UpdateDriverAuthInfoForm;
 import com.powernode.model.vo.driver.DriverAuthInfoVo;
 import com.powernode.model.vo.driver.DriverLoginVo;
 import jakarta.annotation.Resource;
@@ -129,8 +130,21 @@ public class DriverInfoServiceImpl extends ServiceImpl<DriverInfoMapper, DriverI
         //获取回显地址，我们的回显地址是有过期时间的
         driverAuthInfoVo.setIdcardBackShowUrl(cosService.getImageUrl(driverInfo.getIdcardBackUrl()));
         driverAuthInfoVo.setIdcardFrontShowUrl(cosService.getImageUrl(driverInfo.getIdcardFrontUrl()));
-
+        driverAuthInfoVo.setIdcardHandShowUrl(cosService.getImageUrl(driverInfo.getIdcardHandUrl()));
         return driverAuthInfoVo;
     }
 
+
+    /**
+     * 修改配送员信息
+     */
+    @Override
+    public Boolean updateDriverAuthInfo(UpdateDriverAuthInfoForm updateDriverAuthInfoForm) {
+        DriverInfo driverInfo = new DriverInfo();
+        BeanUtils.copyProperties(updateDriverAuthInfoForm, driverInfo);
+        //设置配送员id主键
+        driverInfo.setId(updateDriverAuthInfoForm.getDriverId());
+
+        return updateById(driverInfo);
+    }
 }

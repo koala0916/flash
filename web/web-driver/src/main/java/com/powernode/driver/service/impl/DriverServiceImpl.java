@@ -3,6 +3,7 @@ package com.powernode.driver.service.impl;
 
 import com.powernode.driver.client.DriverInfoFeignClient;
 import com.powernode.driver.service.DriverService;
+import com.powernode.model.form.driver.UpdateDriverAuthInfoForm;
 import com.powernode.model.vo.driver.DriverAuthInfoVo;
 import com.powernode.model.vo.driver.DriverLoginVo;
 import jakarta.annotation.Resource;
@@ -57,5 +58,13 @@ public class DriverServiceImpl implements DriverService {
     @Override
     public DriverAuthInfoVo getDriverAuthInfo(Long driverId) {
         return driverInfoFeignClient.getDriverAuthInfo(driverId).getData();
+    }
+
+    /**
+     * 更新配送员认证信息
+     */
+    @Override
+    public Boolean updateDriverAuthInfo(UpdateDriverAuthInfoForm updateDriverAuthInfoForm) {
+        return driverInfoFeignClient.updateDriverAuthInfo(updateDriverAuthInfoForm).getData();
     }
 }
