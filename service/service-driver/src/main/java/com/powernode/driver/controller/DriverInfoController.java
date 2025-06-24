@@ -2,6 +2,7 @@ package com.powernode.driver.controller;
 
 import com.powernode.common.result.Result;
 import com.powernode.driver.service.DriverInfoService;
+import com.powernode.model.form.driver.DriverFaceModelForm;
 import com.powernode.model.form.driver.UpdateDriverAuthInfoForm;
 import com.powernode.model.vo.driver.DriverAuthInfoVo;
 import com.powernode.model.vo.driver.DriverLoginVo;
@@ -47,6 +48,12 @@ public class DriverInfoController {
     @PostMapping("/updateDriverAuthInfo")
     public Result<Boolean> updateDriverAuthInfo(@RequestBody UpdateDriverAuthInfoForm updateDriverAuthInfoForm) {
         return Result.ok(driverInfoService.updateDriverAuthInfo(updateDriverAuthInfoForm));
+    }
+
+    @Operation(summary = "创建配送员人脸模型")
+    @PostMapping("/createDriverFaceModel")
+    public Result<Boolean> createDriverFaceModel(@RequestBody DriverFaceModelForm driverFaceModelForm) {
+        return Result.ok(driverInfoService.createDriverFaceModel(driverFaceModelForm));
     }
 }
 

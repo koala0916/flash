@@ -4,9 +4,11 @@ import com.powernode.common.annotation.PowerLogin;
 import com.powernode.common.result.Result;
 import com.powernode.common.util.AuthContextHolder;
 import com.powernode.driver.service.DriverService;
+import com.powernode.model.form.driver.DriverFaceModelForm;
 import com.powernode.model.form.driver.UpdateDriverAuthInfoForm;
 import com.powernode.model.vo.driver.DriverAuthInfoVo;
 import com.powernode.model.vo.driver.DriverLoginVo;
+import com.powernode.model.vo.order.CurrentOrderInfoVo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
@@ -57,6 +59,30 @@ public class DriverController {
         Long driverId = AuthContextHolder.getUserId();
         updateDriverAuthInfoForm.setDriverId(driverId);
         return Result.ok(driverService.updateDriverAuthInfo(updateDriverAuthInfoForm));
+    }
+
+
+    @Operation(summary = "创建配送员人脸模型")
+    @PostMapping("/creatDriverFaceModel")
+    @PowerLogin
+    public Result<Boolean> createDriverFaceModel(@RequestBody DriverFaceModelForm driverFaceModelForm){
+        Long driverId = AuthContextHolder.getUserId();
+        driverFaceModelForm.setDriverId(driverId);
+        return Result.ok(driverService.createDriverFaceModel(driverFaceModelForm));
+    }
+
+
+    /**
+     * 目前先写死
+     */
+    @Operation(summary = "查询当前进行中的订单")
+    @PowerLogin
+    @GetMapping("/searchDriverCurrentOrder")
+    public Result<CurrentOrderInfoVo> searchDriverCurrentOrder(){
+        CurrentOrderInfoVo currentOrderInfoVo = new CurrentOrderInfoVo();
+        currentOrderInfoVo.setIsHasCurrentOrder(false);
+
+        return Result.ok(currentOrderInfoVo);
     }
 }
 

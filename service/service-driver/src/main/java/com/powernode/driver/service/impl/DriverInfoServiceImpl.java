@@ -6,6 +6,7 @@ import cn.binarywang.wx.miniapp.bean.WxMaJscode2SessionResult;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.powernode.common.constant.SystemConstant;
+import com.powernode.driver.config.TencentProperties;
 import com.powernode.driver.mapper.DriverAccountMapper;
 import com.powernode.driver.mapper.DriverInfoMapper;
 import com.powernode.driver.mapper.DriverLoginLogMapper;
@@ -16,9 +17,16 @@ import com.powernode.model.entity.driver.DriverAccount;
 import com.powernode.model.entity.driver.DriverInfo;
 import com.powernode.model.entity.driver.DriverLoginLog;
 import com.powernode.model.entity.driver.DriverSet;
+import com.powernode.model.form.driver.DriverFaceModelForm;
 import com.powernode.model.form.driver.UpdateDriverAuthInfoForm;
 import com.powernode.model.vo.driver.DriverAuthInfoVo;
 import com.powernode.model.vo.driver.DriverLoginVo;
+
+import com.tencentcloudapi.common.Credential;
+import com.tencentcloudapi.common.exception.TencentCloudSDKException;
+import com.tencentcloudapi.iai.v20180301.IaiClient;
+import com.tencentcloudapi.iai.v20180301.models.CreatePersonRequest;
+import com.tencentcloudapi.iai.v20180301.models.CreatePersonResponse;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.error.WxErrorException;
@@ -47,6 +55,9 @@ public class DriverInfoServiceImpl extends ServiceImpl<DriverInfoMapper, DriverI
 
     @Resource
     private CosService cosService;
+
+    @Resource
+    private TencentProperties tencentProperties;
 
     @Transactional
     @Override
@@ -146,5 +157,47 @@ public class DriverInfoServiceImpl extends ServiceImpl<DriverInfoMapper, DriverI
         driverInfo.setId(updateDriverAuthInfoForm.getDriverId());
 
         return updateById(driverInfo);
+    }
+
+    /**
+     * 创建人脸库
+     */
+    @Override
+    public Boolean createDriverFaceModel(DriverFaceModelForm driverFaceModelForm) {
+        DriverInfo driverInfo = getById(driverFaceModelForm.getDriverId());
+
+        //创建凭证
+        Credential cred = new Credential(tencentProperties.getSecretId(), tencentProperties.getSecretKey());
+
+        //构建请求对象
+        CreatePersonRequest req = new CreatePersonRequest();
+
+        req.setGroupId(tencentProperties.getPersionGroupId());
+        req.setPersonId(driverInfo.getId().toString());
+        req.setGender(Long.parseLong(driverInfo.getGender()));
+
+        req.setQualityControl(4L);
+        req.setUniquePersonControl(4L);
+        req.setPersonName(driverInfo.getName());
+        //传入人脸识别的图片base64数据
+        req.setImage(driverFaceModelForm.getImageBase64());
+
+
+        //发送请求
+        try {
+            IaiClient iaiClient = new IaiClient(cred, tencentProperties.getRegion());
+            CreatePersonResponse response = iaiClient.CreatePerson(req);
+
+            //从响应中获取faceid 将faceId存入自己的数据库中
+            String faceId = response.getFaceId();
+
+            driverInfo.setFaceModelId(faceId);
+
+            updateById(driverInfo);
+
+            return true;
+        } catch (TencentCloudSDKException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

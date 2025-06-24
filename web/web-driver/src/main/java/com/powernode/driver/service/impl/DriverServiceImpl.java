@@ -3,6 +3,7 @@ package com.powernode.driver.service.impl;
 
 import com.powernode.driver.client.DriverInfoFeignClient;
 import com.powernode.driver.service.DriverService;
+import com.powernode.model.form.driver.DriverFaceModelForm;
 import com.powernode.model.form.driver.UpdateDriverAuthInfoForm;
 import com.powernode.model.vo.driver.DriverAuthInfoVo;
 import com.powernode.model.vo.driver.DriverLoginVo;
@@ -66,5 +67,14 @@ public class DriverServiceImpl implements DriverService {
     @Override
     public Boolean updateDriverAuthInfo(UpdateDriverAuthInfoForm updateDriverAuthInfoForm) {
         return driverInfoFeignClient.updateDriverAuthInfo(updateDriverAuthInfoForm).getData();
+    }
+
+
+    /**
+     * 创建配送员人脸模型
+     */
+    @Override
+    public Boolean createDriverFaceModel(DriverFaceModelForm driverFaceModel) {
+        return driverInfoFeignClient.createDriverFaceModel(driverFaceModel).getData();
     }
 }

@@ -12,5 +12,5 @@ public class TencentProperties {
     private String secretKey;
     private String region;
     private String bucketPrivate;
-
+    private String persionGroupId;
 }
