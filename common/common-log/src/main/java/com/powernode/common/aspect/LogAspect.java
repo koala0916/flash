@@ -29,8 +29,8 @@ import java.util.Map;
 /**
  * 操作日志记录处理
  */
-@Aspect
-@Component
+//@Aspect
+//@Component
 public class LogAspect {
     private static final Logger log = LoggerFactory.getLogger(LogAspect.class);
 

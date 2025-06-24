@@ -4,7 +4,7 @@ import com.powernode.model.form.rules.FeeRuleRequest;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-global com.powernode.model.vo.rules.FeeRuleResponse feeRuleResponse;
+global com.powernode.model.vo.rules.FeeRuleResponse feeRuleResponse; //声明全局变量
 
 /**
 1.起步价
