@@ -1,0 +1,24 @@
+package com.bjpowernode.drools.model;// 包名
+
+import com.bjpowernode.learndrools.entity.User;//导入java类
+
+//判断儿童 0~12岁
+rule "children"
+    no-loop true  //防止死循环
+    when
+        $user: User(age >= 0 && age <= 12)//判断user对象年龄是否在这个区间
+    then
+        $user.setType("儿童");
+        $user.setAge(11);
+        update($user)//更新之后会重写匹配规则
+        System.out.println("设置儿童");
+end
+
+//判断青年
+rule "young"
+    when
+        $user: User(age >= 13 && age <= 18)//判断user对象年龄是否在这个区间
+    then
+        $user.setType("青年");
+        System.out.println("设置青年");
+end
