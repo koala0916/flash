@@ -2,8 +2,10 @@ package com.powernode.customer.controller;
 
 import com.powernode.common.annotation.PowerLogin;
 import com.powernode.common.result.Result;
+import com.powernode.common.util.AuthContextHolder;
 import com.powernode.customer.service.OrderService;
 import com.powernode.model.form.customer.ExpectOrderForm;
+import com.powernode.model.form.customer.SubmitOrderForm;
 import com.powernode.model.vo.customer.ExpectOrderVo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -28,6 +30,17 @@ public class OrderController {
     @PostMapping("/expectOrder")
     public Result<ExpectOrderVo> expectOrder(@RequestBody ExpectOrderForm expectOrderForm) {
         return Result.ok(orderService.expectOrder(expectOrderForm));
+    }
+
+    @Operation(summary = "添加订单")
+    @PowerLogin
+    @PostMapping("/submitOrder")
+    public Result<Long> submitOrder(@RequestBody SubmitOrderForm submitOrderForm) {
+
+        Long userId = AuthContextHolder.getUserId();
+        submitOrderForm.setCustomerId(userId);
+
+        return Result.ok(orderService.addOrder(submitOrderForm));
     }
 }
 
