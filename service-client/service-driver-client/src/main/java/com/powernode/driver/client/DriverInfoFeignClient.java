@@ -1,6 +1,7 @@
 package com.powernode.driver.client;
 
 import com.powernode.common.result.Result;
+import com.powernode.model.entity.driver.DriverSet;
 import com.powernode.model.form.driver.DriverFaceModelForm;
 import com.powernode.model.form.driver.UpdateDriverAuthInfoForm;
 import com.powernode.model.vo.driver.DriverAuthInfoVo;
@@ -29,4 +30,7 @@ public interface DriverInfoFeignClient {
 
     @PostMapping("/driver/info/createDriverFaceModel")
     Result<Boolean> createDriverFaceModel(@RequestBody DriverFaceModelForm driverFaceModelForm);
+
+    @GetMapping("/driver/info/getDriverSet/{driverId}")
+    Result<DriverSet> getDriverSet(@PathVariable Long driverId);
 }

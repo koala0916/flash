@@ -2,6 +2,7 @@ package com.powernode.driver.controller;
 
 import com.powernode.common.result.Result;
 import com.powernode.driver.service.DriverInfoService;
+import com.powernode.model.entity.driver.DriverSet;
 import com.powernode.model.form.driver.DriverFaceModelForm;
 import com.powernode.model.form.driver.UpdateDriverAuthInfoForm;
 import com.powernode.model.vo.driver.DriverAuthInfoVo;
@@ -54,6 +55,12 @@ public class DriverInfoController {
     @PostMapping("/createDriverFaceModel")
     public Result<Boolean> createDriverFaceModel(@RequestBody DriverFaceModelForm driverFaceModelForm) {
         return Result.ok(driverInfoService.createDriverFaceModel(driverFaceModelForm));
+    }
+
+    @Operation(summary = "获取配送员个性化设置")
+    @GetMapping("/getDriverSet/{driverId}")
+    public Result<DriverSet> getDriverSet(@PathVariable Long driverId) {
+        return Result.ok(driverInfoService.getDriverSet(driverId));
     }
 }
 
