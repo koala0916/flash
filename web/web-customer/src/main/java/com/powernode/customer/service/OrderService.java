@@ -9,4 +9,6 @@ public interface OrderService {
     ExpectOrderVo expectOrder(ExpectOrderForm exerciseOrderForm);
 
     Long addOrder(SubmitOrderForm submitOrderForm);
+
+    Integer queryOrderStatus(Long orderId);
 }

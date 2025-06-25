@@ -1,6 +1,7 @@
 package com.powernode.order.service.impl;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.powernode.common.constant.RedisConstant;
 import com.powernode.model.entity.order.OrderInfo;
@@ -68,5 +69,19 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
         redisTemplate.opsForValue().set(RedisConstant.ORDER_ACCEPT_MARK+orderInfo.getId(), orderInfo.getStatus(), RedisConstant.ORDER_ACCEPT_MARK_EXPIRES_TIME, TimeUnit.MINUTES);
 
         return orderInfo.getId();
+    }
+
+
+    /**
+     * 查询订单状态
+     */
+    @Override
+    public Integer queryOrderStatus(Long orderId) {
+        LambdaQueryWrapper<OrderInfo> orderInfoLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        orderInfoLambdaQueryWrapper.select(OrderInfo::getStatus);//只查询状态字段
+        orderInfoLambdaQueryWrapper.eq(OrderInfo::getId, orderId);//根据订单主键查询
+        OrderInfo orderInfo = orderInfoMapper.selectOne(orderInfoLambdaQueryWrapper);
+
+        return orderInfo.getStatus();
     }
 }

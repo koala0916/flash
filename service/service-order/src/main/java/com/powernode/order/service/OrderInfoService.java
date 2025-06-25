@@ -7,4 +7,6 @@ import com.powernode.model.form.order.OrderInfoForm;
 public interface OrderInfoService extends IService<OrderInfo> {
 
     Long addOrderInfo(OrderInfoForm orderInfoForm);
+
+    Integer queryOrderStatus(Long orderId);
 }
