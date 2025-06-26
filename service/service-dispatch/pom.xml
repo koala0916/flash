@@ -11,7 +11,10 @@
     <name>service-dispatch Maven Webapp</name>
     <url>http://maven.apache.org</url>
     <dependencies>
-
+        <dependency>
+            <groupId>com.xuxueli</groupId>
+            <artifactId>xxl-job-core</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <finalName>service-dispatch</finalName>

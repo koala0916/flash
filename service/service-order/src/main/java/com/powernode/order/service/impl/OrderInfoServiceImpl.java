@@ -64,7 +64,6 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
         //日志添加数据库
         orderStatusLogMapper.insert(orderStatusLog);
 
-
         //将订单状态放入redis中 表示是否被接单
         redisTemplate.opsForValue().set(RedisConstant.ORDER_ACCEPT_MARK+orderInfo.getId(), orderInfo.getStatus(), RedisConstant.ORDER_ACCEPT_MARK_EXPIRES_TIME, TimeUnit.MINUTES);
 
