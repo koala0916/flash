@@ -1,14 +1,26 @@
 package com.powernode.map.service.impl;
 
 
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.powernode.common.constant.RedisConstant;
+import com.powernode.common.constant.SystemConstant;
+import com.powernode.driver.client.DriverInfoFeignClient;
 import com.powernode.map.service.LocationService;
+import com.powernode.model.entity.driver.DriverSet;
+import com.powernode.model.form.map.SearchNearByDriverForm;
 import com.powernode.model.form.map.UpdateDriverLocationForm;
+import com.powernode.model.vo.map.NearByDriverVo;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.geo.Point;
+import org.springframework.data.geo.*;
+import org.springframework.data.redis.connection.RedisGeoCommands;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -17,6 +29,9 @@ public class LocationServiceImpl implements LocationService {
 
     @Resource
     private RedisTemplate redisTemplate;
+
+    @Resource
+    private DriverInfoFeignClient driverInfoFeignClient;
 
     /**
      * 将配送员的位置信息存储到redis数据库中
@@ -41,5 +56,70 @@ public class LocationServiceImpl implements LocationService {
     public Boolean removeDriverLocation(Long driverId) {
         redisTemplate.opsForGeo().remove(RedisConstant.DRIVER_GEO_LOCATION, driverId);
         return true;
+    }
+
+
+    /**
+     * 搜索附近合适的配送员
+     */
+    @Override
+    public List<NearByDriverVo> searchNearByDriver(SearchNearByDriverForm searchNearByDriverForm) {
+
+        //查询附近5公里范围内的配送员
+        Point point = new Point(searchNearByDriverForm.getLongitude().doubleValue(), searchNearByDriverForm.getLatitude().doubleValue());
+
+        //定义距离 5公里
+        Distance distance = new Distance(SystemConstant.NEARBY_DRIVER_RADIUS, RedisGeoCommands.DistanceUnit.KILOMETERS);
+
+        //以point为中心点 距离为5公里 画圆
+        Circle circle = new Circle(point, distance);
+
+        //构建geo参数
+        RedisGeoCommands.GeoRadiusCommandArgs args =
+                RedisGeoCommands
+                        .GeoRadiusCommandArgs.newGeoRadiusArgs().
+                        includeCoordinates()  //包含坐标
+                        .includeDistance()   //距离
+                        .sortAscending();   // 排序 升序
+
+        //redis搜索信息、
+        GeoResults<RedisGeoCommands.GeoLocation<String>> result = redisTemplate.opsForGeo().radius(RedisConstant.DRIVER_GEO_LOCATION, circle, args);
+
+        //获取信息
+        List<GeoResult<RedisGeoCommands.GeoLocation<String>>> content = result.getContent();
+
+        //保存符合派单条件的配送员
+        List<NearByDriverVo> list = new ArrayList<>();
+
+        if (CollectionUtils.isNotEmpty(content)){
+            Iterator<GeoResult<RedisGeoCommands.GeoLocation<String>>> iterator = content.iterator();
+
+            while (iterator.hasNext()) {
+                GeoResult<RedisGeoCommands.GeoLocation<String>> item = iterator.next();
+
+                //获取配送员的id  更新配送员位置的时候，存储了经纬度和配送员的id，这里的getName获取的就是配送员的id
+                long driverId = Long.parseLong(item.getContent().getName());
+
+                //距离
+                BigDecimal currentDistance = new BigDecimal(item.getDistance().getValue()).setScale(2, BigDecimal.ROUND_HALF_UP);
+
+
+                //获取配送员个性化参数
+                DriverSet driverSet = driverInfoFeignClient.getDriverSet(driverId).getData();
+                //判断当前订单是否符合配送员的个性化设置
+                if (driverSet.getAcceptDistance().doubleValue() != 0 && driverSet.getAcceptDistance().subtract(currentDistance).doubleValue() < 0) {
+                    continue;
+                }
+
+                //搜索满足条件的配送员
+                NearByDriverVo nearByDriverVo = new NearByDriverVo();
+                nearByDriverVo.setDriverId(driverId);
+                nearByDriverVo.setDistance(currentDistance);
+                list.add(nearByDriverVo);
+
+            }
+        }
+
+        return list;
     }
 }

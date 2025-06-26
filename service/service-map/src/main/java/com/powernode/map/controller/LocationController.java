@@ -2,13 +2,17 @@ package com.powernode.map.controller;
 
 import com.powernode.common.result.Result;
 import com.powernode.map.service.LocationService;
+import com.powernode.model.form.map.SearchNearByDriverForm;
 import com.powernode.model.form.map.UpdateDriverLocationForm;
+import com.powernode.model.vo.map.NearByDriverVo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @Tag(name = "位置API接口管理")
@@ -31,5 +35,12 @@ public class LocationController {
     public Result<Boolean> removeDriverLocation(@PathVariable Long driverId) {
         return Result.ok(locationService.removeDriverLocation(driverId));
     }
+
+    @Operation(summary = "查询附近配送员")
+    @PostMapping("/searchNearByDriver")
+    public Result<List<NearByDriverVo>> searchNearByDriver(@RequestBody SearchNearByDriverForm searchNearByDriverForm) {
+        return Result.ok(locationService.searchNearByDriver(searchNearByDriverForm));
+    }
+
 }
 
