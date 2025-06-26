@@ -4,7 +4,6 @@ package com.powernode.dispatch.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.powernode.common.constant.RedisConstant;
-import com.powernode.common.result.Result;
 import com.powernode.dispatch.client.XxlJobClient;
 import com.powernode.dispatch.mapper.OrderJobMapper;
 import com.powernode.dispatch.service.NewOrderService;
@@ -87,6 +86,7 @@ public class NewOrderServiceImpl implements NewOrderService {
      * 3.搜索附近配送员
      * 4.给配送员派单
      */
+    @Override
     public Boolean executeTask(Long jobId) {
         //1.查询任务参数
         LambdaQueryWrapper<OrderJob> queryWrapper = new LambdaQueryWrapper<>();
