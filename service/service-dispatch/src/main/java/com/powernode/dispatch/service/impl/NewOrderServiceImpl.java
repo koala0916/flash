@@ -122,14 +122,14 @@ public class NewOrderServiceImpl implements NewOrderService {
         //遍历集合
         nearByDriverVoList.forEach(driver -> {
             //同一个配送员只派单1次  订单编号
-            String repeatKey = RedisConstant.DRIVER_ORDER_REPEAT_LIST + newOrderTaskVo.getOrderId();
+            String orderKey = RedisConstant.DRIVER_ORDER_REPEAT_LIST + newOrderTaskVo.getOrderId();
 
-            Boolean member = redisTemplate.opsForSet().isMember(repeatKey, driver.getDriverId());
+            Boolean member = redisTemplate.opsForSet().isMember(orderKey, driver.getDriverId());
             if (!member) {
                 //若进入这里则说明该配送员还没有被派单
 
                 //派单  设置过期时间 16分钟
-                redisTemplate.expire(repeatKey, RedisConstant.DRIVER_ORDER_REPEAT_LIST_EXPIRES_TIME, TimeUnit.MINUTES);
+                redisTemplate.expire(orderKey, RedisConstant.DRIVER_ORDER_REPEAT_LIST_EXPIRES_TIME, TimeUnit.MINUTES);
 
                 //将订单数据保存到redis的list中
                 NewOrderDataVo newOrderDataVo = new NewOrderDataVo();
@@ -137,16 +137,16 @@ public class NewOrderServiceImpl implements NewOrderService {
                 BeanUtils.copyProperties(newOrderTaskVo, newOrderDataVo);
 
                 //将派单信息放入配送员的缓存中，配送员小程序会轮训查询该数据
-                String key = RedisConstant.DRIVER_ORDER_TEMP_LIST + driver.getDriverId();
+                String driverKey = RedisConstant.DRIVER_ORDER_TEMP_LIST + driver.getDriverId();
 
                 //将订单信息放入到配送员id对应的list中
-                redisTemplate.opsForList().leftPush(key,JSONObject.toJSONString(newOrderDataVo));
+                redisTemplate.opsForList().leftPush(driverKey,JSONObject.toJSONString(newOrderDataVo));
 
                 //设置过期时间  防止订单信息刚刚生成，此时配送员下班
-                redisTemplate.expire(key, RedisConstant.DRIVER_ORDER_TEMP_LIST_EXPIRES_TIME, TimeUnit.MINUTES);
+                redisTemplate.expire(driverKey, RedisConstant.DRIVER_ORDER_TEMP_LIST_EXPIRES_TIME, TimeUnit.MINUTES);
 
                 //标记配送员已被派单
-                redisTemplate.opsForSet().add(repeatKey, driver.getDriverId());
+                redisTemplate.opsForSet().add(orderKey, driver.getDriverId());
             }
         });
         return true;

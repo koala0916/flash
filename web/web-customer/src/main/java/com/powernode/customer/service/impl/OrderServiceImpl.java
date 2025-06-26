@@ -2,6 +2,7 @@ package com.powernode.customer.service.impl;
 
 
 import com.powernode.customer.service.OrderService;
+import com.powernode.dispatch.client.NewOrderFeignClient;
 import com.powernode.map.client.MapFeignClient;
 import com.powernode.model.form.customer.ExpectOrderForm;
 import com.powernode.model.form.customer.SubmitOrderForm;
@@ -9,6 +10,7 @@ import com.powernode.model.form.map.CalculateDrivingLineForm;
 import com.powernode.model.form.order.OrderInfoForm;
 import com.powernode.model.form.rules.FeeRuleRequestForm;
 import com.powernode.model.vo.customer.ExpectOrderVo;
+import com.powernode.model.vo.dispatch.NewOrderTaskVo;
 import com.powernode.model.vo.map.DrivingLineVo;
 import com.powernode.model.vo.rules.FeeRuleResponseVo;
 import com.powernode.order.client.OrderInfoFeignClient;
@@ -16,6 +18,7 @@ import com.powernode.rules.client.FeeRuleFeignClient;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -33,6 +36,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Resource
     private OrderInfoFeignClient orderInfoFeignClient;
+    @Autowired
+    private NewOrderFeignClient newOrderFeignClient;
 
     /**
      * 预估订单费用和路线
@@ -91,7 +96,16 @@ public class OrderServiceImpl implements OrderService {
         Long orderId = orderInfoFeignClient.addOrderInfo(orderInfoForm).getData();
 
         //开启定时任务等待配送员接单 TODO
+        NewOrderTaskVo newOrderTaskVo = new NewOrderTaskVo();
 
+        BeanUtils.copyProperties(orderInfoForm, newOrderTaskVo);
+
+        newOrderTaskVo.setOrderId(orderId);
+        newOrderTaskVo.setExpectTime(drivingLineVo.getDuration());//预估时间
+        newOrderTaskVo.setCreateTime(new Date());
+
+        //调用下游服务开启定时任务
+        Long jobId = newOrderFeignClient.addAndStartTask(newOrderTaskVo).getData();
 
 
         return orderId;
