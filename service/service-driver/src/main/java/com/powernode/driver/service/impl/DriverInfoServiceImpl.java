@@ -289,4 +289,25 @@ public class DriverInfoServiceImpl extends ServiceImpl<DriverInfoMapper, DriverI
             throw new PowerException(ResultCodeEnum.FACE_FAIL);
     }
 
+
+    /**
+     * 更新配送员接单状态
+     * @param driverId
+     * @param status
+     * @return
+     */
+    @Override
+    public Boolean updateServiceStatus(Long driverId, Integer status) {
+        LambdaQueryWrapper<DriverSet> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(DriverSet::getDriverId, driverId);
+
+        DriverSet driverSet = new DriverSet();
+        driverSet.setServiceStatus(status);//1表示开始接单  0表示未接单
+
+        driverSetMapper.update(driverSet, queryWrapper);
+
+        return true;
+    }
+
+
 }
