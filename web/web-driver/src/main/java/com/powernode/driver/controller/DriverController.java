@@ -93,5 +93,14 @@ public class DriverController {
         Long driverId = AuthContextHolder.getUserId();
         return Result.ok(driverService.isFaceRecognition(driverId));
     }
+
+    @Operation(summary = "配送员人脸识别验证")
+    @PowerLogin
+    @PostMapping("/verifyDriverFace")
+    public Result<Boolean> verifyDriverFace(@RequestBody DriverFaceModelForm driverFaceModelForm) {
+
+        driverFaceModelForm.setDriverId(AuthContextHolder.getUserId());
+        return Result.ok(driverService.verifyDriverFace(driverFaceModelForm));
+    }
 }
 

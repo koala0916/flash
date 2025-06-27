@@ -6,6 +6,8 @@ import cn.binarywang.wx.miniapp.bean.WxMaJscode2SessionResult;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.powernode.common.constant.SystemConstant;
+import com.powernode.common.execption.PowerException;
+import com.powernode.common.result.ResultCodeEnum;
 import com.powernode.driver.config.TencentProperties;
 import com.powernode.driver.mapper.*;
 import com.powernode.driver.service.CosService;
@@ -18,9 +20,10 @@ import com.powernode.model.vo.driver.DriverLoginVo;
 
 import com.tencentcloudapi.common.Credential;
 import com.tencentcloudapi.common.exception.TencentCloudSDKException;
+import com.tencentcloudapi.common.profile.ClientProfile;
+import com.tencentcloudapi.common.profile.HttpProfile;
 import com.tencentcloudapi.iai.v20180301.IaiClient;
-import com.tencentcloudapi.iai.v20180301.models.CreatePersonRequest;
-import com.tencentcloudapi.iai.v20180301.models.CreatePersonResponse;
+import com.tencentcloudapi.iai.v20180301.models.*;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.error.WxErrorException;
@@ -30,6 +33,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 @Slf4j
 @Service
@@ -56,6 +60,7 @@ public class DriverInfoServiceImpl extends ServiceImpl<DriverInfoMapper, DriverI
 
     @Resource
     private DriverFaceRecognitionMapper driverFaceRecognitionMapper;
+
 
     @Transactional
     @Override
@@ -225,6 +230,63 @@ public class DriverInfoServiceImpl extends ServiceImpl<DriverInfoMapper, DriverI
 
         return count != 0;
 
+    }
+
+
+    /**
+     * 配送员人脸验证
+     */
+    @Override
+    public Boolean verifyDriverFace(DriverFaceModelForm driverFaceModelForm) {
+
+
+        try {
+            //创建凭证
+            Credential cred = new Credential(tencentProperties.getSecretId(), tencentProperties.getSecretKey());
+
+            HttpProfile httpProfile = new HttpProfile();
+        /*
+            端点
+            埋点：编写代码分析用户的一些行为，比如用户点击了某个按钮，或者方法被调用了。
+         */
+            httpProfile.setEndpoint("iai.tencentcloudapi.com");
+            ClientProfile clientProfile = new ClientProfile();
+            clientProfile.setHttpProfile(httpProfile);
+            IaiClient client = new IaiClient(cred, tencentProperties.getRegion(), clientProfile);
+
+            //构建人脸识别request
+            VerifyFaceRequest faceRequest = new VerifyFaceRequest();
+
+            faceRequest.setPersonId(driverFaceModelForm.getDriverId().toString());
+            faceRequest.setImage(driverFaceModelForm.getImageBase64());
+
+            //发送人脸识别请求获取响应
+            VerifyFaceResponse verifyFaceResponse = client.VerifyFace(faceRequest);
+
+            if (verifyFaceResponse.getIsMatch()){
+                //人脸识别通过，需要静态活体检测
+                DetectLiveFaceRequest liveRequest = new DetectLiveFaceRequest();
+                liveRequest.setImage(driverFaceModelForm.getImageBase64());
+                DetectLiveFaceResponse detectLiveFaceResponse = client.DetectLiveFace(liveRequest);
+
+                if (detectLiveFaceResponse.getIsLiveness()){
+                   // 活体检测通过
+                    DriverFaceRecognition driverFaceRecognition = new DriverFaceRecognition();
+
+                    driverFaceRecognition.setDriverId(driverFaceModelForm.getDriverId());
+                    driverFaceRecognition.setFaceDate(new Date());
+
+                    //添加数据
+                    driverFaceRecognitionMapper.insert(driverFaceRecognition);
+                    return true;
+                }
+
+            }
+
+        } catch (TencentCloudSDKException e) {
+            throw new RuntimeException(e);
+        }
+            throw new PowerException(ResultCodeEnum.FACE_FAIL);
     }
 
 }
