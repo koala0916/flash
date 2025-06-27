@@ -1,6 +1,9 @@
 package com.powernode.driver.service.impl;
 
 
+import com.powernode.common.execption.PowerException;
+import com.powernode.common.result.ResultCodeEnum;
+import com.powernode.dispatch.client.NewOrderFeignClient;
 import com.powernode.driver.client.DriverInfoFeignClient;
 import com.powernode.driver.service.DriverService;
 import com.powernode.map.client.LocationFeignClient;
@@ -31,6 +34,9 @@ public class DriverServiceImpl implements DriverService {
 
     @Resource
     private LocationFeignClient locationFeignClient;
+
+    @Resource
+    private NewOrderFeignClient newOrderFeignClient;
 
     @Override
     public String login(String code) {
@@ -97,5 +103,56 @@ public class DriverServiceImpl implements DriverService {
     @Override
     public Boolean verifyDriverFace(DriverFaceModelForm driverFaceModelForm) {
         return driverInfoFeignClient.verifyDriverFace(driverFaceModelForm).getData();
+    }
+
+
+    /**
+     * 配送员开启接单
+     */
+    @Override
+    public Boolean startService(Long driverId) {
+        //判断认证状态
+        DriverLoginVo driverLoginVo = driverInfoFeignClient.getDriverLoginInfo(driverId).getData();
+        if (driverLoginVo.getAuthStatus() != 2) {
+            throw new PowerException(ResultCodeEnum.AUTH_ERROR);
+        }
+
+        //判断当日是否进行人脸识别
+        Boolean isFaceRecognition = driverInfoFeignClient.isFaceRecognition(driverId).getData();
+        if (!isFaceRecognition) {
+            throw new PowerException(ResultCodeEnum.FACE_ERROR);
+        }
+
+        //更新配送员的接单状态为开始接单  1表示开始接单
+        driverInfoFeignClient.updateServiceStatus(driverId, 1);
+
+        //删除配送员的位置信息
+        locationFeignClient.removeDriverLocation(driverId);
+
+        //清空当前配送员在redis中的订单list
+        newOrderFeignClient.clearNewOrderQueueData(driverId);
+
+        return true;
+
+    }
+
+
+    /**
+     * 配送员停止接单
+     * @param driverId
+     * @return
+     */
+    @Override
+    public Boolean stopService(Long driverId) {
+        driverInfoFeignClient.updateServiceStatus(driverId, 0);
+
+        //删除配送员的位置信息
+        locationFeignClient.removeDriverLocation(driverId);
+
+        //清空当前配送员在redis中的订单list
+        newOrderFeignClient.clearNewOrderQueueData(driverId);
+
+        return true;
+
     }
 }

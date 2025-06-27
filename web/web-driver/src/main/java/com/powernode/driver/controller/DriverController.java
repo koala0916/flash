@@ -102,5 +102,21 @@ public class DriverController {
         driverFaceModelForm.setDriverId(AuthContextHolder.getUserId());
         return Result.ok(driverService.verifyDriverFace(driverFaceModelForm));
     }
+
+
+    @Operation(summary = "配送员开始服务")
+    @PowerLogin
+    @GetMapping("/startService")
+    public Result<Boolean> startService() {
+        return Result.ok(driverService.startService(AuthContextHolder.getUserId()));
+    }
+
+
+    @Operation(summary = "配送员结束服务")
+    @PowerLogin
+    @GetMapping("/stopService")
+    public Result<Boolean> stopService() {
+        return Result.ok(driverService.stopService(AuthContextHolder.getUserId()));
+    }
 }
 
