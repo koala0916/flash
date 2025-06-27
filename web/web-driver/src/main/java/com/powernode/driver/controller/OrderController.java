@@ -1,12 +1,17 @@
 package com.powernode.driver.controller;
 
+import com.powernode.common.annotation.PowerLogin;
 import com.powernode.common.result.Result;
+import com.powernode.common.util.AuthContextHolder;
 import com.powernode.driver.service.OrderService;
+import com.powernode.model.vo.order.NewOrderDataVo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @Tag(name = "订单API接口管理")
@@ -23,6 +28,14 @@ public class OrderController {
     @GetMapping("getOrderStatus/{orderId}")
     public Result<Integer> queryOrder(@PathVariable Long orderId) {
         return Result.ok(orderService.queryOrderStatus(orderId));
+    }
+
+    @Operation(summary = "配送员查询当前的订单")
+    @GetMapping("findNewOrderQueueData")
+    @PowerLogin
+    public Result<List<NewOrderDataVo>> findNewOrderQueueData() {
+        Long driverId = AuthContextHolder.getUserId();
+        return Result.ok(orderService.findNewOrderQueueData(driverId));
     }
 }
 

@@ -21,6 +21,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -152,6 +153,45 @@ public class NewOrderServiceImpl implements NewOrderService {
         return true;
     }
 
+
+    /**
+     * 查询配送员的订单
+     */
+    @Override
+    public List<NewOrderDataVo> findNewOrderQueueData(Long driverId) {
+        ArrayList<NewOrderDataVo> list = new ArrayList<>();
+
+        String driverKey = RedisConstant.DRIVER_ORDER_TEMP_LIST + driverId;
+
+        //从redis中查看当前配送员的订单个数
+        Long size = redisTemplate.opsForList().size(driverKey);
+
+        if (size > 0) {
+            for (int i = 0; i < size ; i++) {
+                //有订单，从redis获取订单信息
+                String content = (String) redisTemplate.opsForList().leftPop(driverKey);
+                NewOrderDataVo newOrderDataVo = JSONObject.parseObject(content, NewOrderDataVo.class);
+                list.add(newOrderDataVo);
+            }
+        }
+
+        return list;
+
+    }
+
+
+    /**
+     * 删除redis中配送员的订单信息
+     * 配送员停止配送
+     * @param driverId
+     * @return
+     */
+    @Override
+    public Boolean clearNewOrderQueueData(Long driverId) {
+        String driverKey = RedisConstant.DRIVER_ORDER_TEMP_LIST + driverId;
+        redisTemplate.delete(driverKey);
+        return true;
+    }
 }
 
 
