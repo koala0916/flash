@@ -1,15 +1,11 @@
 package com.powernode.driver.service.impl;
 
 
-import com.powernode.common.execption.PowerException;
-import com.powernode.common.result.ResultCodeEnum;
 import com.powernode.driver.client.DriverInfoFeignClient;
 import com.powernode.driver.service.DriverService;
 import com.powernode.map.client.LocationFeignClient;
-import com.powernode.model.entity.driver.DriverSet;
 import com.powernode.model.form.driver.DriverFaceModelForm;
 import com.powernode.model.form.driver.UpdateDriverAuthInfoForm;
-import com.powernode.model.form.map.UpdateDriverLocationForm;
 import com.powernode.model.vo.driver.DriverAuthInfoVo;
 import com.powernode.model.vo.driver.DriverLoginVo;
 import jakarta.annotation.Resource;
@@ -87,5 +83,11 @@ public class DriverServiceImpl implements DriverService {
     }
 
 
-
+    /**
+     * 查看配送员当天是否进行人脸识别
+     */
+    @Override
+    public Boolean isFaceRecognition(Long driverId) {
+        return driverInfoFeignClient.isFaceRecognition(driverId).getData();
+    }
 }

@@ -19,4 +19,5 @@ public interface DriverService {
 
     Boolean createDriverFaceModel(DriverFaceModelForm driverFaceModel);
 
+    Boolean isFaceRecognition(Long driverId);
 }
