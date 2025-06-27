@@ -4,6 +4,7 @@ import com.powernode.common.annotation.PowerLogin;
 import com.powernode.common.result.Result;
 import com.powernode.common.util.AuthContextHolder;
 import com.powernode.driver.service.OrderService;
+import com.powernode.model.vo.order.CurrentOrderInfoVo;
 import com.powernode.model.vo.order.NewOrderDataVo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -30,12 +31,21 @@ public class OrderController {
         return Result.ok(orderService.queryOrderStatus(orderId));
     }
 
-    @Operation(summary = "配送员查询当前的订单")
+    @Operation(summary = "配送员查询符合的订单")
     @GetMapping("findNewOrderQueueData")
     @PowerLogin
     public Result<List<NewOrderDataVo>> findNewOrderQueueData() {
         Long driverId = AuthContextHolder.getUserId();
         return Result.ok(orderService.findNewOrderQueueData(driverId));
+    }
+
+
+    @Operation(summary = "查看当前配送员是否有配送中的订单")
+    @GetMapping("searchDriverCurrentOrder")
+    public Result<CurrentOrderInfoVo> searchDriverCurrentOrder() {
+        CurrentOrderInfoVo currentOrderInfoVo = new CurrentOrderInfoVo();
+        currentOrderInfoVo.setIsHasCurrentOrder(false);//这里写死，表示当前配送员没有配送中的订单
+        return Result.ok(currentOrderInfoVo);
     }
 }
 
