@@ -39,6 +39,7 @@ public class RedissonConfig {
         //redis://192.168.75.128:6379  redisson与redis的通信地址
         singleServerConfig.setAddress(ADDRESS_PREFIX + host + ":" + port);
         singleServerConfig.setTimeout(timeout);
+        singleServerConfig.setPassword(password);
 
 
         return Redisson.create(config);

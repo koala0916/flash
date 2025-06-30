@@ -6,11 +6,17 @@ spring:
             config:
                 file-extension: yaml
                 prefix: ${spring.application.name}
-                server-addr: localhost:8848
+                server-addr: 192.168.137.1:8848
                 shared-configs:
                     - data-id: common-account.yaml
+                username: nacos
+                password: nacos
+                namespace: 10e26f36-e8f8-4afa-ad44-aec8c0c8d76b
             discovery:
-                server-addr: localhost:8848
+                server-addr: 192.168.137.1:8848
+                username: nacos
+                password: nacos
+                namespace: 10e26f36-e8f8-4afa-ad44-aec8c0c8d76b
     main:
         allow-bean-definition-overriding: true
     profiles:
