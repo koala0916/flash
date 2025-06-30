@@ -34,4 +34,13 @@ public class OrderServiceImpl implements OrderService {
     public List<NewOrderDataVo> findNewOrderQueueData(Long driverId) {
         return newOrderFeignClient.findNewOrderQueueData(driverId).getData();
     }
+
+
+    /**
+     * 配送员抢单
+     */
+    @Override
+    public Boolean robNewOrder(Long driverId, Long orderId) {
+        return orderInfoFeignClient.robNewOrder(driverId, orderId).getData();
+    }
 }

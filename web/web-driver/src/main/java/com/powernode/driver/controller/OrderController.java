@@ -25,6 +25,7 @@ public class OrderController {
     private OrderService orderService;
 
 
+
     @Operation(summary = "配送员查询当前进行中的订单")
     @GetMapping("getOrderStatus/{orderId}")
     public Result<Integer> queryOrder(@PathVariable Long orderId) {
@@ -46,6 +47,15 @@ public class OrderController {
         CurrentOrderInfoVo currentOrderInfoVo = new CurrentOrderInfoVo();
         currentOrderInfoVo.setIsHasCurrentOrder(false);//这里写死，表示当前配送员没有配送中的订单
         return Result.ok(currentOrderInfoVo);
+    }
+
+    @Operation(summary = "配送员抢单")
+    @PowerLogin
+    @GetMapping("/robNewOrder/{orderId}")
+    public Result<Boolean> robNewOrder(@PathVariable Long orderId) {
+        Long userId = AuthContextHolder.getUserId();
+
+        return Result.ok(orderService.robNewOrder(userId, orderId));
     }
 }
 

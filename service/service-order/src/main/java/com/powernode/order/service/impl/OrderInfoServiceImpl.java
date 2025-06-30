@@ -4,6 +4,8 @@ package com.powernode.order.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.powernode.common.constant.RedisConstant;
+import com.powernode.common.execption.PowerException;
+import com.powernode.common.result.ResultCodeEnum;
 import com.powernode.model.entity.order.OrderInfo;
 import com.powernode.model.entity.order.OrderStatusLog;
 import com.powernode.model.enums.OrderStatus;
@@ -82,5 +84,49 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
         OrderInfo orderInfo = orderInfoMapper.selectOne(orderInfoLambdaQueryWrapper);
 
         return orderInfo.getStatus();
+    }
+
+
+    /**
+     * 配送员抢单
+     * 1.判断订单状态(判断该订单状态数据在redis中是否还存在)  是否已被接单
+     * 2.若可以接单，则修改订单状态为已接单
+     * 3.删除redis中的订单
+     */
+    @Transactional
+    @Override
+    public Boolean robNewOrder(Long driverId, Long orderId) {
+        //判断redis中的订单状态是否还存在
+        Boolean orderStatus = redisTemplate.hasKey(RedisConstant.ORDER_ACCEPT_MARK + orderId);
+        if (!orderStatus) {
+            //抢单失败  订单已经被别人抢走了
+            throw new PowerException(ResultCodeEnum.COB_NEW_ORDER_FAIL);
+        }
+
+        //抢单
+        OrderInfo orderInfo = new OrderInfo();
+        orderInfo.setId(orderId);
+        orderInfo.setAcceptTime(new Date());//配送员接单时间
+        orderInfo.setStatus(OrderStatus.ACCEPTED.getStatus());//修改订单状态为已接单
+        orderInfo.setDriverId(driverId);//接单的配送员id
+
+        int num = orderInfoMapper.updateById(orderInfo);
+        if (num != 1) {
+            //修改订单失败
+            throw new PowerException(ResultCodeEnum.COB_NEW_ORDER_FAIL);
+        }
+
+        //记录日志
+        OrderStatusLog orderStatusLog = new OrderStatusLog();
+        orderStatusLog.setOrderId(orderInfo.getId());
+        orderStatusLog.setOrderStatus(orderInfo.getStatus());
+        orderStatusLog.setOperateTime(new Date());
+        orderStatusLogMapper.insert(orderStatusLog);
+
+
+        //配送员抢单后删除redis中的该订单数据
+        redisTemplate.delete(RedisConstant.ORDER_ACCEPT_MARK + orderInfo.getId());
+
+        return true;
     }
 }
