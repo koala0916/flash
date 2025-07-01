@@ -5,6 +5,7 @@ import com.powernode.common.execption.PowerException;
 import com.powernode.common.result.ResultCodeEnum;
 import com.powernode.customer.service.OrderService;
 import com.powernode.dispatch.client.NewOrderFeignClient;
+import com.powernode.driver.client.DriverInfoFeignClient;
 import com.powernode.map.client.MapFeignClient;
 import com.powernode.model.entity.order.OrderInfo;
 import com.powernode.model.form.customer.ExpectOrderForm;
@@ -14,6 +15,7 @@ import com.powernode.model.form.order.OrderInfoForm;
 import com.powernode.model.form.rules.FeeRuleRequestForm;
 import com.powernode.model.vo.customer.ExpectOrderVo;
 import com.powernode.model.vo.dispatch.NewOrderTaskVo;
+import com.powernode.model.vo.driver.DriverInfoVo;
 import com.powernode.model.vo.map.DrivingLineVo;
 import com.powernode.model.vo.order.CurrentOrderInfoVo;
 import com.powernode.model.vo.order.OrderInfoVo;
@@ -43,6 +45,8 @@ public class OrderServiceImpl implements OrderService {
     private OrderInfoFeignClient orderInfoFeignClient;
     @Autowired
     private NewOrderFeignClient newOrderFeignClient;
+    @Autowired
+    private DriverInfoFeignClient driverInfoFeignClient;
 
     /**
      * 预估订单费用和路线
@@ -152,5 +156,25 @@ public class OrderServiceImpl implements OrderService {
         orderInfoVo.setOrderId(orderId);
 
         return orderInfoVo;
+    }
+
+
+    /**
+     * 查看配送员的基本信息
+     * @param orderId
+     * @param customerId
+     * @return
+     */
+    @Override
+    public DriverInfoVo getDriverInfo(Long orderId, Long customerId) {
+        //查询订单信息  从这里获取配送员的 id
+        OrderInfo orderInfo = orderInfoFeignClient.getOrderInfo(orderId).getData();
+
+        if (orderInfo.getCustomerId().longValue() != customerId.longValue()) {
+            throw new PowerException(ResultCodeEnum.ILLEGAL_REQUEST);
+        }
+
+        //根据配送员id查询配送员信息
+        return driverInfoFeignClient.getDriverInfoOrder(orderInfo.getDriverId()).getData();
     }
 }

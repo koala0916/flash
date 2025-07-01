@@ -5,6 +5,7 @@ import com.powernode.model.entity.driver.DriverSet;
 import com.powernode.model.form.driver.DriverFaceModelForm;
 import com.powernode.model.form.driver.UpdateDriverAuthInfoForm;
 import com.powernode.model.vo.driver.DriverAuthInfoVo;
+import com.powernode.model.vo.driver.DriverInfoVo;
 import com.powernode.model.vo.driver.DriverLoginVo;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,4 +45,8 @@ public interface DriverInfoFeignClient {
 
     @GetMapping("/driver/info/updateServiceStatus/{driverId}/{status}")
     Result< Boolean> updateServiceStatus(@PathVariable Long driverId, @PathVariable Integer status);
+
+
+    @GetMapping("/driver/info/getDriverInfoOrder/{driverId}")
+    Result<DriverInfoVo> getDriverInfoOrder(@PathVariable Long driverId);
 }

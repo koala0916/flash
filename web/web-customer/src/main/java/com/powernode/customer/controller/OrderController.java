@@ -7,6 +7,7 @@ import com.powernode.customer.service.OrderService;
 import com.powernode.model.form.customer.ExpectOrderForm;
 import com.powernode.model.form.customer.SubmitOrderForm;
 import com.powernode.model.vo.customer.ExpectOrderVo;
+import com.powernode.model.vo.driver.DriverInfoVo;
 import com.powernode.model.vo.order.CurrentOrderInfoVo;
 import com.powernode.model.vo.order.OrderInfoVo;
 import io.swagger.v3.oas.annotations.Operation;
@@ -66,6 +67,14 @@ public class OrderController {
         Long customerId = AuthContextHolder.getUserId();
 
         return Result.ok(orderService.getOrderInfo(orderId, customerId));
+    }
+
+
+    @Operation(summary = "获取配送员信息")
+    @PowerLogin
+    @GetMapping("/getDriverInfo/{orderId}")
+    public Result<DriverInfoVo> getDriverInfo(@PathVariable Long orderId) {
+        return Result.ok(orderService.getDriverInfo(orderId, AuthContextHolder.getUserId()));
     }
 }
 

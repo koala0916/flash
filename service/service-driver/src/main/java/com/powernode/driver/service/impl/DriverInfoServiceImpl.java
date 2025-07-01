@@ -16,6 +16,7 @@ import com.powernode.model.entity.driver.*;
 import com.powernode.model.form.driver.DriverFaceModelForm;
 import com.powernode.model.form.driver.UpdateDriverAuthInfoForm;
 import com.powernode.model.vo.driver.DriverAuthInfoVo;
+import com.powernode.model.vo.driver.DriverInfoVo;
 import com.powernode.model.vo.driver.DriverLoginVo;
 
 import com.tencentcloudapi.common.Credential;
@@ -307,6 +308,24 @@ public class DriverInfoServiceImpl extends ServiceImpl<DriverInfoMapper, DriverI
         driverSetMapper.update(driverSet, queryWrapper);
 
         return true;
+    }
+
+
+    /**
+     * 查询配送员的基本信息返回给小程序
+     */
+    @Override
+    public DriverInfoVo getDriverInfoOrder(Long driverId) {
+        DriverInfo driverInfo = getById(driverId);
+
+        DriverInfoVo driverInfoVo = new DriverInfoVo();
+        BeanUtils.copyProperties(driverInfo, driverInfoVo);
+
+        //我们没有做上传驾驶证的功能，所以这里写死
+        driverInfoVo.setDriverLicenseAge(1);
+
+        return driverInfoVo;
+
     }
 
 
