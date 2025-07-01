@@ -43,7 +43,7 @@ public class LocationServiceImpl implements LocationService {
         Point point = new Point(updateDriverLocationForm.getLongitude().doubleValue(), updateDriverLocationForm.getLatitude().doubleValue());
 
         //这里使用的是opsForGeo
-        redisTemplate.opsForGeo().add(RedisConstant.DRIVER_GEO_LOCATION,point, updateDriverLocationForm.getDriverId());
+        redisTemplate.opsForGeo().add(RedisConstant.DRIVER_GEO_LOCATION,point, updateDriverLocationForm.getDriverId()+"");
 
         return true;
     }
@@ -98,7 +98,8 @@ public class LocationServiceImpl implements LocationService {
                 GeoResult<RedisGeoCommands.GeoLocation<String>> item = iterator.next();
 
                 //获取配送员的id  更新配送员位置的时候，存储了经纬度和配送员的id，这里的getName获取的就是配送员的id
-                long driverId = Long.parseLong(item.getContent().getName());
+                String name = item.getContent().getName();
+                long driverId = Long.parseLong(name);
 
                 //距离
                 BigDecimal currentDistance = new BigDecimal(item.getDistance().getValue()).setScale(2, BigDecimal.ROUND_HALF_UP);

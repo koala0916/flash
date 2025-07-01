@@ -20,6 +20,6 @@ public interface LocationFeignClient {
     @DeleteMapping("/map/location/removeDriverLocation/{driverId}")
     Result<Boolean> removeDriverLocation(@PathVariable Long driverId);
 
-    @PostMapping("/searchNearByDriver")
+    @PostMapping("/map/location/searchNearByDriver")
     Result<List<NearByDriverVo>> searchNearByDriver(@RequestBody SearchNearByDriverForm searchNearByDriverForm);
 }
