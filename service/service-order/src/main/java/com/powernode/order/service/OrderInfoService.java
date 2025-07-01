@@ -3,6 +3,7 @@ package com.powernode.order.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.powernode.model.entity.order.OrderInfo;
 import com.powernode.model.form.order.OrderInfoForm;
+import com.powernode.model.form.order.UpdateOrderCartForm;
 import com.powernode.model.vo.order.CurrentOrderInfoVo;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,4 +21,6 @@ public interface OrderInfoService extends IService<OrderInfo> {
     CurrentOrderInfoVo searchDriverCurrentOrder(Long driverId);
 
     Boolean driverArrivedStartLocation(Long orderId, Long driverId);
+
+    Boolean updateDriverCarInfo(UpdateOrderCartForm updateOrderCartForm);
 }

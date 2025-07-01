@@ -8,6 +8,7 @@ import com.powernode.driver.service.OrderService;
 import com.powernode.map.client.MapFeignClient;
 import com.powernode.model.entity.order.OrderInfo;
 import com.powernode.model.form.map.CalculateDrivingLineForm;
+import com.powernode.model.form.order.UpdateOrderCartForm;
 import com.powernode.model.vo.map.DrivingLineVo;
 import com.powernode.model.vo.order.CurrentOrderInfoVo;
 import com.powernode.model.vo.order.NewOrderDataVo;
@@ -100,4 +101,12 @@ public class OrderServiceImpl implements OrderService {
     public Boolean driverArrivedStartLocation(Long orderId, Long driverId) {
         return orderInfoFeignClient.driverArrivedStartLocation(orderId, driverId).getData();
     }
+
+
+    @Override
+    public Boolean updateDriverCarInfo(UpdateOrderCartForm updateOrderCartForm) {
+        return orderInfoFeignClient.updateOrderCart(updateOrderCartForm).getData();
+    }
+
+
 }

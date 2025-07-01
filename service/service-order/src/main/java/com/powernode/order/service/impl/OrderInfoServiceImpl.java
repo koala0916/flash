@@ -10,6 +10,7 @@ import com.powernode.model.entity.order.OrderInfo;
 import com.powernode.model.entity.order.OrderStatusLog;
 import com.powernode.model.enums.OrderStatus;
 import com.powernode.model.form.order.OrderInfoForm;
+import com.powernode.model.form.order.UpdateOrderCartForm;
 import com.powernode.model.vo.order.CurrentOrderInfoVo;
 import com.powernode.order.mapper.OrderInfoMapper;
 import com.powernode.order.mapper.OrderStatusLogMapper;
@@ -264,6 +265,33 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
         updateOrderInfo.setArriveTime(new Date());//配送员到达的时间
         int num = orderInfoMapper.update(updateOrderInfo, queryWrapper);
 
+        if (num == 1){
+            //记录日志 这里省略
+        }else {
+            throw new PowerException(ResultCodeEnum.UPDATE_ERROR);
+        }
+
+        return true;
+    }
+
+
+    /**
+     * 更新配送员车辆信息
+     */
+    @Override
+    public Boolean updateDriverCarInfo(UpdateOrderCartForm updateOrderCartForm) {
+        LambdaQueryWrapper<OrderInfo> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(OrderInfo::getId, updateOrderCartForm.getOrderId());
+        queryWrapper.eq(OrderInfo::getDriverId, updateOrderCartForm.getDriverId());
+
+        //修改数据库的订单信息
+        OrderInfo updateOrderInfo = new OrderInfo();
+
+        BeanUtils.copyProperties(updateOrderCartForm, updateOrderInfo);
+        //这里与数据库对不上
+        updateOrderInfo.setStatus(OrderStatus.UPDATE_CART_INFO.getStatus());
+
+        int num = orderInfoMapper.update(updateOrderInfo, queryWrapper);
         if (num == 1){
             //记录日志 这里省略
         }else {

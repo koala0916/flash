@@ -3,6 +3,7 @@ package com.powernode.order.controller;
 import com.powernode.common.result.Result;
 import com.powernode.model.entity.order.OrderInfo;
 import com.powernode.model.form.order.OrderInfoForm;
+import com.powernode.model.form.order.UpdateOrderCartForm;
 import com.powernode.model.vo.order.CurrentOrderInfoVo;
 import com.powernode.order.service.OrderInfoService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -69,6 +70,12 @@ public class OrderInfoController {
     @GetMapping("/driverArrivedStartLocation/{orderId}/{driverId}")
     public Result<Boolean> driverArrivedStartLocation(@PathVariable Long orderId, @PathVariable Long driverId) {
         return Result.ok(orderInfoService.driverArrivedStartLocation(orderId, driverId));
+    }
+
+    @Operation(summary = "更新配送员车辆信息")
+    @PostMapping("/updateOrderCart")
+    public Result<Boolean> updateOrderCart(@RequestBody UpdateOrderCartForm updateOrderCartForm) {
+        return Result.ok(orderInfoService.updateDriverCarInfo(updateOrderCartForm));
     }
 }
 
