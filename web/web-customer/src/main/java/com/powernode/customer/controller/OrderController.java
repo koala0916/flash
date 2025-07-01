@@ -89,7 +89,7 @@ public class OrderController {
 
     @Operation(summary = "获取最佳路线")
     @PowerLogin
-    @PostMapping("/calculateDrivinLine")
+    @PostMapping("/calculateDrivingLine")
     public Result<DrivingLineVo> calculateDrivingLine(@RequestBody CalculateDrivingLineForm calculateDrivingLineForm) {
         return Result.ok(orderService.calculateDrivingLine(calculateDrivingLineForm));
     }
