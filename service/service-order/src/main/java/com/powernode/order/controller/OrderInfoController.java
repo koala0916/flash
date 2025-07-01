@@ -1,6 +1,7 @@
 package com.powernode.order.controller;
 
 import com.powernode.common.result.Result;
+import com.powernode.model.entity.order.OrderInfo;
 import com.powernode.model.form.order.OrderInfoForm;
 import com.powernode.model.vo.order.CurrentOrderInfoVo;
 import com.powernode.order.service.OrderInfoService;
@@ -55,6 +56,12 @@ public class OrderInfoController {
     @GetMapping("/searchDriverCurrentOrder/{driverId}")
     public Result<CurrentOrderInfoVo> searchDriverCurrentOrder(@PathVariable Long driverId) {
         return Result.ok(orderInfoService.searchDriverCurrentOrder(driverId));
+    }
+
+    @Operation(summary = "根据订单id查看订单信息")
+    @GetMapping("/getOrderInfo/{orderId}")
+    public Result<OrderInfo> getOrderInfo(@PathVariable Long orderId) {
+        return Result.ok(orderInfoService.getById(orderId));
     }
 }
 

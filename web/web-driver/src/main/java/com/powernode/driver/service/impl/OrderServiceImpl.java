@@ -1,13 +1,18 @@
 package com.powernode.driver.service.impl;
 
 
+import com.powernode.common.execption.PowerException;
+import com.powernode.common.result.ResultCodeEnum;
 import com.powernode.dispatch.client.NewOrderFeignClient;
 import com.powernode.driver.service.OrderService;
+import com.powernode.model.entity.order.OrderInfo;
 import com.powernode.model.vo.order.CurrentOrderInfoVo;
 import com.powernode.model.vo.order.NewOrderDataVo;
+import com.powernode.model.vo.order.OrderInfoVo;
 import com.powernode.order.client.OrderInfoFeignClient;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -52,5 +57,24 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public CurrentOrderInfoVo searchDriverCurrentOrder(Long driverId) {
         return orderInfoFeignClient.searchDriverCurrentOrder(driverId).getData();
+    }
+
+    /**
+     * 根据订单id查询配送员订单信息
+     */
+    @Override
+    public OrderInfoVo getOrderInfo(Long orderId, Long driverId) {
+        OrderInfo orderInfo = orderInfoFeignClient.getOrderInfo(orderId).getData();
+
+        if (orderInfo.getDriverId().longValue() != driverId.longValue()) {
+            throw new PowerException(ResultCodeEnum.ILLEGAL_REQUEST);
+        }
+
+        //封装订单信息
+        OrderInfoVo orderInfoVo = new OrderInfoVo();
+        orderInfoVo.setOrderId(orderInfo.getId());
+        BeanUtils.copyProperties(orderInfo, orderInfoVo);
+
+        return orderInfoVo;
     }
 }

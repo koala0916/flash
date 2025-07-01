@@ -8,6 +8,7 @@ import com.powernode.model.form.customer.ExpectOrderForm;
 import com.powernode.model.form.customer.SubmitOrderForm;
 import com.powernode.model.vo.customer.ExpectOrderVo;
 import com.powernode.model.vo.order.CurrentOrderInfoVo;
+import com.powernode.model.vo.order.OrderInfoVo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
@@ -58,5 +59,13 @@ public class OrderController {
     }
 
 
+    @Operation(summary = "获取订单信息")
+    @PowerLogin
+    @GetMapping("/getOrderInfo/{orderId}")
+    public Result<OrderInfoVo> getOrderInfo(@PathVariable Long orderId) {
+        Long customerId = AuthContextHolder.getUserId();
+
+        return Result.ok(orderService.getOrderInfo(orderId, customerId));
+    }
 }
 

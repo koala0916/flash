@@ -4,6 +4,7 @@ import com.powernode.model.form.customer.ExpectOrderForm;
 import com.powernode.model.form.customer.SubmitOrderForm;
 import com.powernode.model.vo.customer.ExpectOrderVo;
 import com.powernode.model.vo.order.CurrentOrderInfoVo;
+import com.powernode.model.vo.order.OrderInfoVo;
 
 public interface OrderService {
 
@@ -14,4 +15,6 @@ public interface OrderService {
     Integer queryOrderStatus(Long orderId);
 
     CurrentOrderInfoVo searchCustomerCurrentOrder(Long customerId);
+
+    OrderInfoVo getOrderInfo(Long orderId, Long customerId);
 }

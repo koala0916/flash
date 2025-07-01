@@ -1,6 +1,7 @@
 package com.powernode.order.client;
 
 import com.powernode.common.result.Result;
+import com.powernode.model.entity.order.OrderInfo;
 import com.powernode.model.form.order.OrderInfoForm;
 import com.powernode.model.vo.order.CurrentOrderInfoVo;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -27,4 +28,7 @@ public interface OrderInfoFeignClient {
 
     @GetMapping("/order/info/searchDriverCurrentOrder/{driverId}")
     Result<CurrentOrderInfoVo> searchDriverCurrentOrder(@PathVariable Long driverId);
+
+    @GetMapping("/order/info/getOrderInfo/{orderId}")
+    Result<OrderInfo> getOrderInfo(@PathVariable Long orderId);
 }

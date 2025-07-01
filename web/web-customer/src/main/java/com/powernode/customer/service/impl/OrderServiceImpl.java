@@ -1,9 +1,12 @@
 package com.powernode.customer.service.impl;
 
 
+import com.powernode.common.execption.PowerException;
+import com.powernode.common.result.ResultCodeEnum;
 import com.powernode.customer.service.OrderService;
 import com.powernode.dispatch.client.NewOrderFeignClient;
 import com.powernode.map.client.MapFeignClient;
+import com.powernode.model.entity.order.OrderInfo;
 import com.powernode.model.form.customer.ExpectOrderForm;
 import com.powernode.model.form.customer.SubmitOrderForm;
 import com.powernode.model.form.map.CalculateDrivingLineForm;
@@ -13,6 +16,7 @@ import com.powernode.model.vo.customer.ExpectOrderVo;
 import com.powernode.model.vo.dispatch.NewOrderTaskVo;
 import com.powernode.model.vo.map.DrivingLineVo;
 import com.powernode.model.vo.order.CurrentOrderInfoVo;
+import com.powernode.model.vo.order.OrderInfoVo;
 import com.powernode.model.vo.rules.FeeRuleResponseVo;
 import com.powernode.order.client.OrderInfoFeignClient;
 import com.powernode.rules.client.FeeRuleFeignClient;
@@ -128,5 +132,25 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public CurrentOrderInfoVo searchCustomerCurrentOrder(Long customerId) {
         return orderInfoFeignClient.searchCustomerCurrentOrder(customerId).getData();
+    }
+
+    /**
+     * 根据订单id查询订单信息
+     */
+    @Override
+    public OrderInfoVo getOrderInfo(Long orderId, Long customerId) {
+        OrderInfo orderInfo = orderInfoFeignClient.getOrderInfo(orderId).getData();
+
+        //防止数据泄露  别人仅知道订单号，不能查询订单信息
+        if (orderInfo.getCustomerId().longValue() != customerId.longValue()) {
+            throw new PowerException(ResultCodeEnum.ILLEGAL_REQUEST);
+        }
+
+        //封装订单信息
+        OrderInfoVo orderInfoVo = new OrderInfoVo();
+        BeanUtils.copyProperties(orderInfo, orderInfoVo);
+        orderInfoVo.setOrderId(orderId);
+
+        return orderInfoVo;
     }
 }
