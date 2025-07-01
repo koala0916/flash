@@ -3,6 +3,7 @@ package com.powernode.map.client;
 import com.powernode.common.result.Result;
 import com.powernode.model.form.map.SearchNearByDriverForm;
 import com.powernode.model.form.map.UpdateDriverLocationForm;
+import com.powernode.model.form.map.UpdateOrderLocationForm;
 import com.powernode.model.vo.map.NearByDriverVo;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,4 +23,7 @@ public interface LocationFeignClient {
 
     @PostMapping("/map/location/searchNearByDriver")
     Result<List<NearByDriverVo>> searchNearByDriver(@RequestBody SearchNearByDriverForm searchNearByDriverForm);
+
+    @PostMapping("/map/location/updateOrderLocationToCache")
+    Result<Boolean> updateOrderLocationToCache(@RequestBody UpdateOrderLocationForm updateOrderLocationForm);
 }

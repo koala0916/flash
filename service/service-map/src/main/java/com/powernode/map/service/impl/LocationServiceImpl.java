@@ -9,7 +9,9 @@ import com.powernode.map.service.LocationService;
 import com.powernode.model.entity.driver.DriverSet;
 import com.powernode.model.form.map.SearchNearByDriverForm;
 import com.powernode.model.form.map.UpdateDriverLocationForm;
+import com.powernode.model.form.map.UpdateOrderLocationForm;
 import com.powernode.model.vo.map.NearByDriverVo;
+import com.powernode.model.vo.map.OrderLocationVo;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.geo.*;
@@ -122,5 +124,23 @@ public class LocationServiceImpl implements LocationService {
         }
 
         return list;
+    }
+
+
+    /**
+     * 位置同显 更新配送员位置信息
+     * @param updateOrderLocationForm
+     * @return
+     */
+    @Override
+    public Boolean updateOrderLocationToCache(UpdateOrderLocationForm updateOrderLocationForm) {
+        OrderLocationVo orderLocationVo = new OrderLocationVo();
+        orderLocationVo.setLatitude(updateOrderLocationForm.getLatitude());
+        orderLocationVo.setLongitude(updateOrderLocationForm.getLongitude());
+
+        //将位置数据放入redis
+        redisTemplate.opsForValue().set(RedisConstant.UPDATE_ORDER_LOCATION+updateOrderLocationForm.getOrderId(), orderLocationVo);
+
+        return true;
     }
 }

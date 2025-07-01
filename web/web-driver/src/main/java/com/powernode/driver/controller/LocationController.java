@@ -5,6 +5,7 @@ import com.powernode.common.result.Result;
 import com.powernode.common.util.AuthContextHolder;
 import com.powernode.driver.service.LocationService;
 import com.powernode.model.form.map.UpdateDriverLocationForm;
+import com.powernode.model.form.map.UpdateOrderLocationForm;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
@@ -37,5 +38,12 @@ public class LocationController {
         return Result.ok(locationService.updateDriverLocation(updateDriverLocationForm));
     }
 
+
+    @Operation(summary = "更新配送员位置信息到缓存  位置同显")
+    @PowerLogin
+    @PostMapping("/updateDriverLocationToCache")
+    public Result<Boolean> updateDriverLocationToCache(@RequestBody UpdateOrderLocationForm updateOrderLocationForm) {
+        return Result.ok(locationService.updateOrderLocationToCache(updateOrderLocationForm));
+    }
 }
 

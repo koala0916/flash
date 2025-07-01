@@ -8,6 +8,7 @@ import com.powernode.driver.service.LocationService;
 import com.powernode.map.client.LocationFeignClient;
 import com.powernode.model.entity.driver.DriverSet;
 import com.powernode.model.form.map.UpdateDriverLocationForm;
+import com.powernode.model.form.map.UpdateOrderLocationForm;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -39,5 +40,14 @@ public class LocationServiceImpl implements LocationService {
         throw new PowerException(ResultCodeEnum.NO_START_SERVICE);
 
 
+    }
+
+
+    /**
+     * 更新配送员位置到缓存
+     */
+    @Override
+    public Boolean updateOrderLocationToCache(UpdateOrderLocationForm updateOrderLocationForm) {
+        return locationFeignClient.updateOrderLocationToCache(updateOrderLocationForm).getData();
     }
 }
