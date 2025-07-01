@@ -3,6 +3,7 @@ package com.powernode.order.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.powernode.model.entity.order.OrderInfo;
 import com.powernode.model.form.order.OrderInfoForm;
+import com.powernode.model.vo.order.CurrentOrderInfoVo;
 import org.springframework.transaction.annotation.Transactional;
 
 public interface OrderInfoService extends IService<OrderInfo> {
@@ -13,4 +14,6 @@ public interface OrderInfoService extends IService<OrderInfo> {
 
     @Transactional
     Boolean robNewOrder(Long driverId, Long orderId);
+
+    CurrentOrderInfoVo searchCustomerCurrentOrder(Long customerId);
 }

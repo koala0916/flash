@@ -52,11 +52,11 @@ public class OrderController {
     @PowerLogin
     @GetMapping("/searchCustomerCurrentOrder")
     public Result<CurrentOrderInfoVo> searchCustomerCurrentOrder() {
-        CurrentOrderInfoVo currentOrderInfoVo = new CurrentOrderInfoVo();
+        Long customerId = AuthContextHolder.getUserId();
 
-        //这里暂时写false，无订单状态
-        currentOrderInfoVo.setIsHasCurrentOrder(false);
-        return Result.ok(currentOrderInfoVo);
+        return Result.ok(orderService.searchCustomerCurrentOrder(customerId));
     }
+
+
 }
 

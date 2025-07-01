@@ -2,6 +2,7 @@ package com.powernode.order.controller;
 
 import com.powernode.common.result.Result;
 import com.powernode.model.form.order.OrderInfoForm;
+import com.powernode.model.vo.order.CurrentOrderInfoVo;
 import com.powernode.order.service.OrderInfoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -42,6 +43,12 @@ public class OrderInfoController {
     @GetMapping("/robNewOrder/{driverId}/{orderId}")
     public Result<Boolean> robNewOrder(@PathVariable Long driverId, @PathVariable Long orderId) {
         return Result.ok(orderInfoService.robNewOrder(driverId, orderId));
+    }
+
+    @Operation(summary = "查询当前订单信息")
+    @GetMapping("/searchCustomerCurrentOrder/{customerId}")
+    public Result<CurrentOrderInfoVo> searchCustomerCurrentOrder(@PathVariable Long customerId) {
+        return Result.ok(orderInfoService.searchCustomerCurrentOrder(customerId));
     }
 }
 

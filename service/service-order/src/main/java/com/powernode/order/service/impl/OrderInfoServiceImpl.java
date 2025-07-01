@@ -10,6 +10,7 @@ import com.powernode.model.entity.order.OrderInfo;
 import com.powernode.model.entity.order.OrderStatusLog;
 import com.powernode.model.enums.OrderStatus;
 import com.powernode.model.form.order.OrderInfoForm;
+import com.powernode.model.vo.order.CurrentOrderInfoVo;
 import com.powernode.order.mapper.OrderInfoMapper;
 import com.powernode.order.mapper.OrderStatusLogMapper;
 import com.powernode.order.service.OrderInfoService;
@@ -163,5 +164,52 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
 
 
         return true;
+    }
+
+
+    /**
+     * 查询当前进行中的订单
+     * @param customerId
+     * @return
+     */
+    @Override
+    public CurrentOrderInfoVo searchCustomerCurrentOrder(Long customerId) {
+        LambdaQueryWrapper<OrderInfo> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(OrderInfo::getCustomerId, customerId);
+
+        //下面这些订单状态需要自动打开订单页面
+        Integer[] statusArray = {
+                OrderStatus.ACCEPTED.getStatus(),
+                OrderStatus.DRIVER_ARRIVED.getStatus(),
+                OrderStatus.UPDATE_CART_INFO.getStatus(),
+                OrderStatus.START_SERVICE.getStatus(),
+                OrderStatus.END_SERVICE.getStatus(),
+                OrderStatus.UNPAID.getStatus()
+        };
+
+        queryWrapper.in(OrderInfo::getStatus, statusArray);
+        //结果排序
+        queryWrapper.orderByDesc(OrderInfo::getId);
+
+        //获取第一个订单
+        queryWrapper.last("limit 1");
+
+        OrderInfo orderInfo = orderInfoMapper.selectOne(queryWrapper);
+
+        CurrentOrderInfoVo currentOrderInfoVo = new CurrentOrderInfoVo();
+
+        if (orderInfo != null) {
+            //说明当前有正在进行中的订单
+            currentOrderInfoVo.setIsHasCurrentOrder(true);
+            currentOrderInfoVo.setOrderId(orderInfo.getId());
+            currentOrderInfoVo.setStatus(orderInfo.getStatus());
+        }else {
+            //当前没有符合条件的订单信息
+            currentOrderInfoVo.setIsHasCurrentOrder(false);
+        }
+
+        return currentOrderInfoVo;
+
+
     }
 }

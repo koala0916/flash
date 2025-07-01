@@ -2,6 +2,7 @@ package com.powernode.order.client;
 
 import com.powernode.common.result.Result;
 import com.powernode.model.form.order.OrderInfoForm;
+import com.powernode.model.vo.order.CurrentOrderInfoVo;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,4 +21,7 @@ public interface OrderInfoFeignClient {
 
     @GetMapping("/order/info/robNewOrder/{driverId}/{orderId}")
     Result<Boolean> robNewOrder(@PathVariable Long driverId, @PathVariable Long orderId);
+
+    @GetMapping("/order/info/searchCustomerCurrentOrder/{customerId}")
+    Result<CurrentOrderInfoVo> searchCustomerCurrentOrder(@PathVariable Long customerId);
 }

@@ -12,6 +12,7 @@ import com.powernode.model.form.rules.FeeRuleRequestForm;
 import com.powernode.model.vo.customer.ExpectOrderVo;
 import com.powernode.model.vo.dispatch.NewOrderTaskVo;
 import com.powernode.model.vo.map.DrivingLineVo;
+import com.powernode.model.vo.order.CurrentOrderInfoVo;
 import com.powernode.model.vo.rules.FeeRuleResponseVo;
 import com.powernode.order.client.OrderInfoFeignClient;
 import com.powernode.rules.client.FeeRuleFeignClient;
@@ -118,5 +119,14 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Integer queryOrderStatus(Long orderId) {
         return orderInfoFeignClient.getOrderStatus(orderId).getData();
+    }
+
+
+    /**
+     * 顾客查询当前是否有进行中的订单
+     */
+    @Override
+    public CurrentOrderInfoVo searchCustomerCurrentOrder(Long customerId) {
+        return orderInfoFeignClient.searchCustomerCurrentOrder(customerId).getData();
     }
 }
