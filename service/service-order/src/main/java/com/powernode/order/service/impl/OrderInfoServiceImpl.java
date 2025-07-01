@@ -212,4 +212,40 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
 
 
     }
+
+    /**
+     * 配送员查看当前进行中的订单
+     */
+    @Override
+    public CurrentOrderInfoVo searchDriverCurrentOrder(Long driverId) {
+        LambdaQueryWrapper<OrderInfo> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(OrderInfo::getDriverId, driverId);
+        //配送员发送完账单，以下这些订单状态时都会自动打开订单页面
+        Integer[] statusArray = {
+                OrderStatus.ACCEPTED.getStatus(),
+                OrderStatus.DRIVER_ARRIVED.getStatus(),
+                OrderStatus.UPDATE_CART_INFO.getStatus(),
+                OrderStatus.START_SERVICE.getStatus(),
+                OrderStatus.END_SERVICE.getStatus()
+        };
+
+        queryWrapper.in(OrderInfo::getStatus, statusArray);
+        queryWrapper.orderByDesc(OrderInfo::getId);
+        queryWrapper.last("limit 1");
+        OrderInfo orderInfo = orderInfoMapper.selectOne(queryWrapper);
+
+        CurrentOrderInfoVo currentOrderInfoVo = new CurrentOrderInfoVo();
+
+        if (orderInfo != null) {
+            //说明当前有正在进行中的订单
+            currentOrderInfoVo.setIsHasCurrentOrder(true);
+            currentOrderInfoVo.setOrderId(orderInfo.getId());
+            currentOrderInfoVo.setStatus(orderInfo.getStatus());
+        }else {
+            //当前没有符合条件的订单信息
+            currentOrderInfoVo.setIsHasCurrentOrder(false);
+        }
+
+        return currentOrderInfoVo;
+    }
 }

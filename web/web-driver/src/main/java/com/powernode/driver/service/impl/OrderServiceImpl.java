@@ -3,6 +3,7 @@ package com.powernode.driver.service.impl;
 
 import com.powernode.dispatch.client.NewOrderFeignClient;
 import com.powernode.driver.service.OrderService;
+import com.powernode.model.vo.order.CurrentOrderInfoVo;
 import com.powernode.model.vo.order.NewOrderDataVo;
 import com.powernode.order.client.OrderInfoFeignClient;
 import jakarta.annotation.Resource;
@@ -42,5 +43,14 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Boolean robNewOrder(Long driverId, Long orderId) {
         return orderInfoFeignClient.robNewOrder(driverId, orderId).getData();
+    }
+
+
+    /**
+     * 配送员查看当前进行中的订单
+     */
+    @Override
+    public CurrentOrderInfoVo searchDriverCurrentOrder(Long driverId) {
+        return orderInfoFeignClient.searchDriverCurrentOrder(driverId).getData();
     }
 }

@@ -1,5 +1,6 @@
 package com.powernode.driver.service;
 
+import com.powernode.model.vo.order.CurrentOrderInfoVo;
 import com.powernode.model.vo.order.NewOrderDataVo;
 
 import java.util.List;
@@ -12,4 +13,6 @@ public interface OrderService {
     List<NewOrderDataVo> findNewOrderQueueData(Long driverId);
 
     Boolean robNewOrder(Long driverId, Long orderId);
+
+    CurrentOrderInfoVo searchDriverCurrentOrder(Long driverId);
 }

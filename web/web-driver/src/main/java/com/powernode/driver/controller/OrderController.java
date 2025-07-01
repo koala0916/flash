@@ -42,11 +42,11 @@ public class OrderController {
 
 
     @Operation(summary = "查看当前配送员是否有配送中的订单")
-    @GetMapping("searchDriverCurrentOrder")
+    @PowerLogin
+    @GetMapping("/searchDriverCurrentOrder")
     public Result<CurrentOrderInfoVo> searchDriverCurrentOrder() {
-        CurrentOrderInfoVo currentOrderInfoVo = new CurrentOrderInfoVo();
-        currentOrderInfoVo.setIsHasCurrentOrder(false);//这里写死，表示当前配送员没有配送中的订单
-        return Result.ok(currentOrderInfoVo);
+        Long driverId = AuthContextHolder.getUserId();
+        return Result.ok(orderService.searchDriverCurrentOrder(driverId));
     }
 
     @Operation(summary = "配送员抢单")
@@ -57,5 +57,8 @@ public class OrderController {
 
         return Result.ok(orderService.robNewOrder(userId, orderId));
     }
+
+
+
 }
 
