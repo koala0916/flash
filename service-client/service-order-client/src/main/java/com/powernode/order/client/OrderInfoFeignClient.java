@@ -31,4 +31,7 @@ public interface OrderInfoFeignClient {
 
     @GetMapping("/order/info/getOrderInfo/{orderId}")
     Result<OrderInfo> getOrderInfo(@PathVariable Long orderId);
+
+    @GetMapping("/order/info/driverArrivedStartLocation/{orderId}/{driverId}")
+    Result<Boolean> driverArrivedStartLocation(@PathVariable Long orderId, @PathVariable Long driverId);
 }

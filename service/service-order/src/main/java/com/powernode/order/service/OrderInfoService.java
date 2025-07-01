@@ -18,4 +18,6 @@ public interface OrderInfoService extends IService<OrderInfo> {
     CurrentOrderInfoVo searchCustomerCurrentOrder(Long customerId);
 
     CurrentOrderInfoVo searchDriverCurrentOrder(Long driverId);
+
+    Boolean driverArrivedStartLocation(Long orderId, Long driverId);
 }

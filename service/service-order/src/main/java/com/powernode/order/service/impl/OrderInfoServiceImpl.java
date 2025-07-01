@@ -248,4 +248,28 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
 
         return currentOrderInfoVo;
     }
+
+
+    /**
+     * 配送员到达指定位置
+     */
+    @Override
+    public Boolean driverArrivedStartLocation(Long orderId, Long driverId) {
+        LambdaQueryWrapper<OrderInfo> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(OrderInfo::getId, orderId);
+        queryWrapper.eq(OrderInfo::getDriverId, driverId);
+
+        OrderInfo updateOrderInfo = new OrderInfo();
+        updateOrderInfo.setStatus(OrderStatus.DRIVER_ARRIVED.getStatus());//修改订单状态为配送员已到达
+        updateOrderInfo.setArriveTime(new Date());//配送员到达的时间
+        int num = orderInfoMapper.update(updateOrderInfo, queryWrapper);
+
+        if (num == 1){
+            //记录日志 这里省略
+        }else {
+            throw new PowerException(ResultCodeEnum.UPDATE_ERROR);
+        }
+
+        return true;
+    }
 }
