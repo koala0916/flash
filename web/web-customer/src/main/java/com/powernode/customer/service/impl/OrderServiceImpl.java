@@ -6,6 +6,7 @@ import com.powernode.common.result.ResultCodeEnum;
 import com.powernode.customer.service.OrderService;
 import com.powernode.dispatch.client.NewOrderFeignClient;
 import com.powernode.driver.client.DriverInfoFeignClient;
+import com.powernode.map.client.LocationFeignClient;
 import com.powernode.map.client.MapFeignClient;
 import com.powernode.model.entity.order.OrderInfo;
 import com.powernode.model.form.customer.ExpectOrderForm;
@@ -17,6 +18,7 @@ import com.powernode.model.vo.customer.ExpectOrderVo;
 import com.powernode.model.vo.dispatch.NewOrderTaskVo;
 import com.powernode.model.vo.driver.DriverInfoVo;
 import com.powernode.model.vo.map.DrivingLineVo;
+import com.powernode.model.vo.map.OrderLocationVo;
 import com.powernode.model.vo.order.CurrentOrderInfoVo;
 import com.powernode.model.vo.order.OrderInfoVo;
 import com.powernode.model.vo.rules.FeeRuleResponseVo;
@@ -47,6 +49,8 @@ public class OrderServiceImpl implements OrderService {
     private NewOrderFeignClient newOrderFeignClient;
     @Autowired
     private DriverInfoFeignClient driverInfoFeignClient;
+    @Autowired
+    private LocationFeignClient locationFeignClient;
 
     /**
      * 预估订单费用和路线
@@ -176,5 +180,18 @@ public class OrderServiceImpl implements OrderService {
 
         //根据配送员id查询配送员信息
         return driverInfoFeignClient.getDriverInfoOrder(orderInfo.getDriverId()).getData();
+    }
+
+
+
+    @Override
+    public OrderLocationVo getCacheOrderLocation(Long orderId) {
+       return locationFeignClient.getCacheOrderLocation(orderId).getData();
+    }
+
+
+    @Override
+    public DrivingLineVo calculateDrivingLine(CalculateDrivingLineForm calculateDrivingLineForm) {
+        return mapFeignClient.calculateDrivingLine(calculateDrivingLineForm).getData();
     }
 }

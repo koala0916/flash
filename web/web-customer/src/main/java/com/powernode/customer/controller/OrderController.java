@@ -6,8 +6,11 @@ import com.powernode.common.util.AuthContextHolder;
 import com.powernode.customer.service.OrderService;
 import com.powernode.model.form.customer.ExpectOrderForm;
 import com.powernode.model.form.customer.SubmitOrderForm;
+import com.powernode.model.form.map.CalculateDrivingLineForm;
 import com.powernode.model.vo.customer.ExpectOrderVo;
 import com.powernode.model.vo.driver.DriverInfoVo;
+import com.powernode.model.vo.map.DrivingLineVo;
+import com.powernode.model.vo.map.OrderLocationVo;
 import com.powernode.model.vo.order.CurrentOrderInfoVo;
 import com.powernode.model.vo.order.OrderInfoVo;
 import io.swagger.v3.oas.annotations.Operation;
@@ -75,6 +78,20 @@ public class OrderController {
     @GetMapping("/getDriverInfo/{orderId}")
     public Result<DriverInfoVo> getDriverInfo(@PathVariable Long orderId) {
         return Result.ok(orderService.getDriverInfo(orderId, AuthContextHolder.getUserId()));
+    }
+
+
+    @Operation(summary = "获取订单位置信息")
+    @GetMapping("/getCacheOrderLocation/{orderId}")
+    public Result<OrderLocationVo> getCacheOrderLocation(@PathVariable Long orderId) {
+        return Result.ok(orderService.getCacheOrderLocation(orderId));
+    }
+
+    @Operation(summary = "获取最佳路线")
+    @PowerLogin
+    @PostMapping("/calculateDrivinLine")
+    public Result<DrivingLineVo> calculateDrivingLine(@RequestBody CalculateDrivingLineForm calculateDrivingLineForm) {
+        return Result.ok(orderService.calculateDrivingLine(calculateDrivingLineForm));
     }
 }
 

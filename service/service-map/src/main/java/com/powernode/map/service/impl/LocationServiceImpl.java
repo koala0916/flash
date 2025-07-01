@@ -143,4 +143,13 @@ public class LocationServiceImpl implements LocationService {
 
         return true;
     }
+
+
+    /*
+        获取订单起始位置信息
+     */
+    @Override
+    public OrderLocationVo getCacheOrderLocation(Long orderId) {
+        return (OrderLocationVo) redisTemplate.opsForValue().get(RedisConstant.UPDATE_ORDER_LOCATION+orderId);
+    }
 }
