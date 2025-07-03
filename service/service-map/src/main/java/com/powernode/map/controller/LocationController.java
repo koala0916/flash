@@ -8,6 +8,7 @@ import com.powernode.model.form.map.UpdateDriverLocationForm;
 import com.powernode.model.form.map.UpdateOrderLocationForm;
 import com.powernode.model.vo.map.NearByDriverVo;
 import com.powernode.model.vo.map.OrderLocationVo;
+import com.powernode.model.vo.map.OrderServiceLastLocationVo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
@@ -62,6 +63,12 @@ public class LocationController {
     @PostMapping("/saveOrderServiceLocation")
     public Result<Boolean> saveOrderServiceLocation(@RequestBody List<OrderServiceLocationForm> orderServiceLocationForms) {
         return Result.ok(locationService.saveOrderServiceLocation(orderServiceLocationForms));
+    }
+
+    @Operation(summary = "获取订单配送服务最后位置信息")
+    @GetMapping("/getOrderServiceLastLocation/{orderId}")
+    public Result<OrderServiceLastLocationVo> getOrderServiceLastLocation(@PathVariable Long orderId) {
+        return Result.ok(locationService.getOrderServiceLastLocation(orderId));
     }
 }
 

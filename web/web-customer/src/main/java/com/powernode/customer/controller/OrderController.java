@@ -11,6 +11,7 @@ import com.powernode.model.vo.customer.ExpectOrderVo;
 import com.powernode.model.vo.driver.DriverInfoVo;
 import com.powernode.model.vo.map.DrivingLineVo;
 import com.powernode.model.vo.map.OrderLocationVo;
+import com.powernode.model.vo.map.OrderServiceLastLocationVo;
 import com.powernode.model.vo.order.CurrentOrderInfoVo;
 import com.powernode.model.vo.order.OrderInfoVo;
 import io.swagger.v3.oas.annotations.Operation;
@@ -92,6 +93,13 @@ public class OrderController {
     @PostMapping("/calculateDrivingLine")
     public Result<DrivingLineVo> calculateDrivingLine(@RequestBody CalculateDrivingLineForm calculateDrivingLineForm) {
         return Result.ok(orderService.calculateDrivingLine(calculateDrivingLineForm));
+    }
+
+
+    @Operation(summary = "获取配送员最后的位置信息")
+    @GetMapping("/getOrderServiceLastLocation/{orderId}")
+    public Result<OrderServiceLastLocationVo> getOrderServiceLastLocation(@PathVariable Long orderId) {
+        return Result.ok(orderService.getOrderServiceLastLocation(orderId));
     }
 }
 

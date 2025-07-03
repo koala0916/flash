@@ -19,6 +19,7 @@ import com.powernode.model.vo.dispatch.NewOrderTaskVo;
 import com.powernode.model.vo.driver.DriverInfoVo;
 import com.powernode.model.vo.map.DrivingLineVo;
 import com.powernode.model.vo.map.OrderLocationVo;
+import com.powernode.model.vo.map.OrderServiceLastLocationVo;
 import com.powernode.model.vo.order.CurrentOrderInfoVo;
 import com.powernode.model.vo.order.OrderInfoVo;
 import com.powernode.model.vo.rules.FeeRuleResponseVo;
@@ -194,4 +195,13 @@ public class OrderServiceImpl implements OrderService {
     public DrivingLineVo calculateDrivingLine(CalculateDrivingLineForm calculateDrivingLineForm) {
         return mapFeignClient.calculateDrivingLine(calculateDrivingLineForm).getData();
     }
+
+    /**
+     * 查看配送员最后的位置信息
+     */
+    @Override
+    public OrderServiceLastLocationVo getOrderServiceLastLocation(Long orderId) {
+        return locationFeignClient.getOrderServiceLastLocation(orderId).getData();
+    }
+
 }

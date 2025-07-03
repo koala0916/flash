@@ -15,11 +15,16 @@ import com.powernode.model.form.map.UpdateDriverLocationForm;
 import com.powernode.model.form.map.UpdateOrderLocationForm;
 import com.powernode.model.vo.map.NearByDriverVo;
 import com.powernode.model.vo.map.OrderLocationVo;
+import com.powernode.model.vo.map.OrderServiceLastLocationVo;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.geo.*;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.redis.connection.RedisGeoCommands;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -43,6 +48,9 @@ public class LocationServiceImpl implements LocationService {
 
     @Resource
     private OrderServiceLocationRepository orderServiceLocationRepository;
+
+    @Resource
+    private MongoTemplate mongoTemplate;
 
     /**
      * 将配送员的位置信息存储到redis数据库中
@@ -185,5 +193,25 @@ public class LocationServiceImpl implements LocationService {
         orderServiceLocationRepository.saveAll(list);
 
         return true;
+    }
+
+
+    /**
+     * 获取配送员最后的位置信息
+     */
+    @Override
+    public OrderServiceLastLocationVo getOrderServiceLastLocation(Long orderId) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("orderId").is(orderId));//根据订单编号查询
+        query.with(Sort.by(Sort.Direction.DESC, "createTime"));//根据创建时间排序，找最近的时间
+        query.limit(1);//若时间相同，则查询1条数据
+
+        //操作mongodb
+        OrderServiceLocation orderServiceLocation = mongoTemplate.findOne(query, OrderServiceLocation.class);
+
+        OrderServiceLastLocationVo orderServiceLastLocationVo = new OrderServiceLastLocationVo();
+        BeanUtils.copyProperties(orderServiceLocation, orderServiceLastLocationVo);
+
+        return orderServiceLastLocationVo;
     }
 }

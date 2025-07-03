@@ -7,6 +7,7 @@ import com.powernode.model.vo.customer.ExpectOrderVo;
 import com.powernode.model.vo.driver.DriverInfoVo;
 import com.powernode.model.vo.map.DrivingLineVo;
 import com.powernode.model.vo.map.OrderLocationVo;
+import com.powernode.model.vo.map.OrderServiceLastLocationVo;
 import com.powernode.model.vo.order.CurrentOrderInfoVo;
 import com.powernode.model.vo.order.OrderInfoVo;
 
@@ -27,4 +28,6 @@ public interface OrderService {
     OrderLocationVo getCacheOrderLocation(Long orderId);
 
     DrivingLineVo calculateDrivingLine(CalculateDrivingLineForm calculateDrivingLineForm);
+
+    OrderServiceLastLocationVo getOrderServiceLastLocation(Long orderId);
 }

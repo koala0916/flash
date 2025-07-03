@@ -6,6 +6,7 @@ import com.powernode.model.form.map.UpdateDriverLocationForm;
 import com.powernode.model.form.map.UpdateOrderLocationForm;
 import com.powernode.model.vo.map.NearByDriverVo;
 import com.powernode.model.vo.map.OrderLocationVo;
+import com.powernode.model.vo.map.OrderServiceLastLocationVo;
 
 import java.util.List;
 
@@ -25,4 +26,6 @@ public interface LocationService {
     OrderLocationVo getCacheOrderLocation(Long orderId);
 
     Boolean saveOrderServiceLocation(List<OrderServiceLocationForm> orderServiceLocationForms);
+
+    OrderServiceLastLocationVo getOrderServiceLastLocation(Long orderId);
 }

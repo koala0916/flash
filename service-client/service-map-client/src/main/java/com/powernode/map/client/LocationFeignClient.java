@@ -7,6 +7,7 @@ import com.powernode.model.form.map.UpdateDriverLocationForm;
 import com.powernode.model.form.map.UpdateOrderLocationForm;
 import com.powernode.model.vo.map.NearByDriverVo;
 import com.powernode.model.vo.map.OrderLocationVo;
+import com.powernode.model.vo.map.OrderServiceLastLocationVo;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,4 +32,7 @@ public interface LocationFeignClient {
 
     @PostMapping("/map/location/saveOrderServiceLocation")
     Result<Boolean> saveOrderServiceLocation(@RequestBody List<OrderServiceLocationForm> orderServiceLocationForms);
+
+    @GetMapping("/map/location/getOrderServiceLastLocation/{orderId}")
+    Result<OrderServiceLastLocationVo> getOrderServiceLastLocation(@PathVariable Long orderId);
 }
