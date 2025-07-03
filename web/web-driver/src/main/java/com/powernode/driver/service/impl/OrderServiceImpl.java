@@ -8,6 +8,7 @@ import com.powernode.driver.service.OrderService;
 import com.powernode.map.client.MapFeignClient;
 import com.powernode.model.entity.order.OrderInfo;
 import com.powernode.model.form.map.CalculateDrivingLineForm;
+import com.powernode.model.form.order.StartDriveForm;
 import com.powernode.model.form.order.UpdateOrderCartForm;
 import com.powernode.model.vo.map.DrivingLineVo;
 import com.powernode.model.vo.order.CurrentOrderInfoVo;
@@ -108,5 +109,8 @@ public class OrderServiceImpl implements OrderService {
         return orderInfoFeignClient.updateOrderCart(updateOrderCartForm).getData();
     }
 
-
+    @Override
+    public Boolean startDrive(StartDriveForm startDriveForm) {
+        return orderInfoFeignClient.startDrive(startDriveForm).getData();
+    }
 }

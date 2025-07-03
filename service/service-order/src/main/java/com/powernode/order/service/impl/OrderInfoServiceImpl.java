@@ -10,6 +10,7 @@ import com.powernode.model.entity.order.OrderInfo;
 import com.powernode.model.entity.order.OrderStatusLog;
 import com.powernode.model.enums.OrderStatus;
 import com.powernode.model.form.order.OrderInfoForm;
+import com.powernode.model.form.order.StartDriveForm;
 import com.powernode.model.form.order.UpdateOrderCartForm;
 import com.powernode.model.vo.order.CurrentOrderInfoVo;
 import com.powernode.order.mapper.OrderInfoMapper;
@@ -300,4 +301,32 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
 
         return true;
     }
+
+
+    /**
+     * 修改状态为开始配送
+     */
+    @Override
+    public Boolean startDrive(StartDriveForm startDriveForm) {
+        LambdaQueryWrapper<OrderInfo> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(OrderInfo::getId, startDriveForm.getOrderId());
+        queryWrapper.eq(OrderInfo::getDriverId, startDriveForm.getDriverId());
+
+        OrderInfo updateOrderInfo = new OrderInfo();
+
+        //修改状态为开始配送
+        updateOrderInfo.setStatus(OrderStatus.START_SERVICE.getStatus());
+
+        updateOrderInfo.setStartServiceTime(new Date());
+        int num = orderInfoMapper.update(updateOrderInfo, queryWrapper);
+
+        if (num == 1){
+            //记录日志 这里省略
+        }else {
+            throw new PowerException(ResultCodeEnum.UPDATE_ERROR);
+        }
+
+        return true;
+    }
+
 }

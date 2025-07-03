@@ -3,6 +3,7 @@ package com.powernode.order.controller;
 import com.powernode.common.result.Result;
 import com.powernode.model.entity.order.OrderInfo;
 import com.powernode.model.form.order.OrderInfoForm;
+import com.powernode.model.form.order.StartDriveForm;
 import com.powernode.model.form.order.UpdateOrderCartForm;
 import com.powernode.model.vo.order.CurrentOrderInfoVo;
 import com.powernode.order.service.OrderInfoService;
@@ -76,6 +77,12 @@ public class OrderInfoController {
     @PostMapping("/updateOrderCart")
     public Result<Boolean> updateOrderCart(@RequestBody UpdateOrderCartForm updateOrderCartForm) {
         return Result.ok(orderInfoService.updateDriverCarInfo(updateOrderCartForm));
+    }
+
+    @Operation(summary = "配送员开始配送")
+    @PostMapping("/startDrive")
+    public Result<Boolean> startDrive(@RequestBody StartDriveForm startDriveForm) {
+        return Result.ok(orderInfoService.startDrive(startDriveForm));
     }
 }
 

@@ -5,6 +5,7 @@ import com.powernode.common.result.Result;
 import com.powernode.common.util.AuthContextHolder;
 import com.powernode.driver.service.OrderService;
 import com.powernode.model.form.map.CalculateDrivingLineForm;
+import com.powernode.model.form.order.StartDriveForm;
 import com.powernode.model.form.order.UpdateOrderCartForm;
 import com.powernode.model.vo.map.DrivingLineVo;
 import com.powernode.model.vo.order.CurrentOrderInfoVo;
@@ -95,6 +96,16 @@ public class OrderController {
         updateOrderCartForm.setDriverId(userId);
 
         return Result.ok(orderService.updateDriverCarInfo(updateOrderCartForm));
+    }
+
+
+    @Operation(summary = "配送员开始配送")
+    @PowerLogin
+    @PostMapping("/startDrive")
+    public Result<Boolean> startDrive(@RequestBody StartDriveForm startDriveForm) {
+        Long userId = AuthContextHolder.getUserId();
+        startDriveForm.setDriverId(userId);
+        return Result.ok(orderService.startDrive(startDriveForm));
     }
 }
 
