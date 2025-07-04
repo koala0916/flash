@@ -107,5 +107,14 @@ public class OrderController {
         startDriveForm.setDriverId(userId);
         return Result.ok(orderService.startDrive(startDriveForm));
     }
+
+
+    @Operation(summary = "配送员到达配送起始地点")
+    @PowerLogin
+    @GetMapping("/driverArriveStartLocation/{orderId}")
+    public Result<Boolean> driverArriveStartLocation(@PathVariable Long orderId) {
+        Long driverId = AuthContextHolder.getUserId();
+        return Result.ok(orderService.driverArriveStartLocation(orderId, driverId));
+    }
 }
 

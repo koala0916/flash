@@ -84,5 +84,12 @@ public class OrderInfoController {
     public Result<Boolean> startDrive(@RequestBody StartDriveForm startDriveForm) {
         return Result.ok(orderInfoService.startDrive(startDriveForm));
     }
+
+
+    @Operation(summary = "配送员到达起始点")
+    @GetMapping("/driverArriveStartLocation/{orderId}/{driverId}")
+    public Result<Boolean> driverArriveStartLocation(@PathVariable Long orderId, @PathVariable Long driverId) {
+        return Result.ok(orderInfoService.driverArriveStartLocation(orderId, driverId));
+    }
 }
 

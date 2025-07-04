@@ -42,4 +42,10 @@ public interface OrderInfoFeignClient {
 
     @PostMapping("/order/info/startDrive")
     Result<Boolean> startDrive(@RequestBody StartDriveForm startDriveForm);
+
+    /**
+     * 配送员到达起始点
+     */
+    @GetMapping("/order/info/driverArriveStartLocation/{orderId}/{driverId}")
+    Result<Boolean> driverArriveStartLocation(@PathVariable("orderId") Long orderId, @PathVariable("driverId") Long driverId);
 }

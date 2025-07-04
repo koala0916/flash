@@ -30,4 +30,6 @@ public interface OrderService {
     Boolean updateDriverCarInfo(UpdateOrderCartForm updateOrderCartForm);
 
     Boolean startDrive(StartDriveForm startDriveForm);
+
+    Boolean driverArriveStartLocation(Long orderId, Long driverId);
 }

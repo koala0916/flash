@@ -26,4 +26,7 @@ public interface OrderInfoService extends IService<OrderInfo> {
     Boolean updateDriverCarInfo(UpdateOrderCartForm updateOrderCartForm);
 
     Boolean startDrive(StartDriveForm startDriveForm);
+
+    @Transactional(rollbackFor = Exception.class)
+    Boolean driverArriveStartLocation(Long orderId, Long driverId);
 }
