@@ -1,10 +1,12 @@
 package com.powernode.driver.service.impl;
 
 
+import com.powernode.driver.client.CiFeignClient;
 import com.powernode.driver.service.FileService;
 import com.powernode.driver.service.MonitorService;
 import com.powernode.model.entity.order.OrderMonitorRecord;
 import com.powernode.model.form.order.OrderMonitorForm;
+import com.powernode.model.vo.order.TextAuditingVo;
 import com.powernode.order.client.OrderMonitorFeignClient;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +24,9 @@ public class MonitorServiceImpl implements MonitorService {
     @Resource
     private FileService fileService;
 
+    @Resource
+    private CiFeignClient ciFeignClient;
+
     /**
      * 保存minio中的音频地址和文字
      */
@@ -37,6 +42,13 @@ public class MonitorServiceImpl implements MonitorService {
         orderMonitorRecord.setOrderId(orderMonitorForm.getOrderId());
         orderMonitorRecord.setFileUrl(url);
         orderMonitorRecord.setContent(orderMonitorForm.getContent());
+
+        //查看审核内容
+        TextAuditingVo textAuditingVo = ciFeignClient.textAuditing(orderMonitorForm.getContent()).getData();
+
+        orderMonitorRecord.setResult(textAuditingVo.getResult());
+        orderMonitorRecord.setKeywords(textAuditingVo.getKeywords());
+
 
         orderMonitorFeignClient.saveMonitorRecord(orderMonitorRecord);
 
