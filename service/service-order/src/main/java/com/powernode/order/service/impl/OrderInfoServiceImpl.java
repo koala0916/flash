@@ -7,6 +7,7 @@ import com.powernode.common.constant.RedisConstant;
 import com.powernode.common.execption.PowerException;
 import com.powernode.common.result.ResultCodeEnum;
 import com.powernode.model.entity.order.OrderInfo;
+import com.powernode.model.entity.order.OrderMonitor;
 import com.powernode.model.entity.order.OrderStatusLog;
 import com.powernode.model.enums.OrderStatus;
 import com.powernode.model.form.order.OrderInfoForm;
@@ -16,6 +17,7 @@ import com.powernode.model.vo.order.CurrentOrderInfoVo;
 import com.powernode.order.mapper.OrderInfoMapper;
 import com.powernode.order.mapper.OrderStatusLogMapper;
 import com.powernode.order.service.OrderInfoService;
+import com.powernode.order.service.OrderMonitorService;
 import jakarta.annotation.Resource;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
@@ -43,6 +45,9 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
 
     @Resource
     private RedissonClient redissonClient;
+
+    @Resource
+    private OrderMonitorService orderMonitorService;
 
 
     /**
@@ -325,6 +330,11 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
         }else {
             throw new PowerException(ResultCodeEnum.UPDATE_ERROR);
         }
+
+        //开始监控
+        OrderMonitor orderMonitor = new OrderMonitor();
+        orderMonitor.setOrderId(startDriveForm.getOrderId());
+        orderMonitorService.addOrderMonitor(orderMonitor);
 
         return true;
     }

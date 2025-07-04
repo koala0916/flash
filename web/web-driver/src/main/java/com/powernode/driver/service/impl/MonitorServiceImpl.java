@@ -4,6 +4,7 @@ package com.powernode.driver.service.impl;
 import com.powernode.driver.client.CiFeignClient;
 import com.powernode.driver.service.FileService;
 import com.powernode.driver.service.MonitorService;
+import com.powernode.model.entity.order.OrderMonitor;
 import com.powernode.model.entity.order.OrderMonitorRecord;
 import com.powernode.model.form.order.OrderMonitorForm;
 import com.powernode.model.vo.order.TextAuditingVo;
@@ -51,6 +52,18 @@ public class MonitorServiceImpl implements MonitorService {
 
 
         orderMonitorFeignClient.saveMonitorRecord(orderMonitorRecord);
+
+        //查询订单监控信息
+        OrderMonitor orderMonitor = orderMonitorFeignClient.getOrderMonitor(orderMonitorRecord.getOrderId()).getData();
+        int fileNum = orderMonitor.getFileNum() + 1;
+        orderMonitor.setFileNum(fileNum);
+
+        //审核结果: 0（审核正常），1 （判定为违规敏感文件），2（疑似敏感，建议人工复核）。
+        if("3".equals(orderMonitorRecord.getResult())) {
+            int auditNum = orderMonitor.getAuditNum() + 1;
+            orderMonitor.setAuditNum(auditNum);
+        }
+        orderMonitorFeignClient.updateOrderMonitor(orderMonitor);
 
         return true;
 

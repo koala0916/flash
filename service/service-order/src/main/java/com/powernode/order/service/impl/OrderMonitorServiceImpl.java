@@ -1,6 +1,7 @@
 package com.powernode.order.service.impl;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.powernode.model.entity.order.OrderMonitor;
 import com.powernode.model.entity.order.OrderMonitorRecord;
@@ -25,5 +26,27 @@ public class OrderMonitorServiceImpl extends ServiceImpl<OrderMonitorMapper, Ord
     public Boolean saveOrderMonitorRecord(OrderMonitorRecord orderMonitorRecord) {
         orderMonitorRecordRepository.save(orderMonitorRecord);
         return true;
+    }
+
+    /**
+     * 根据订单ID查询订单监控信息
+     */
+    @Override
+    public OrderMonitor getOrderMonitor(Long orderId) {
+        LambdaQueryWrapper<OrderMonitor> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(OrderMonitor::getOrderId, orderId);
+
+        return getOne(queryWrapper);
+    }
+
+    @Override
+    public Boolean updateOrderMonitor(OrderMonitor orderMonitor) {
+        return updateById(orderMonitor);
+    }
+
+    @Override
+    public Long addOrderMonitor(OrderMonitor orderMonitor) {
+        save(orderMonitor);
+        return orderMonitor.getId();
     }
 }
