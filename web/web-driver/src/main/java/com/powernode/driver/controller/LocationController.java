@@ -44,7 +44,7 @@ public class LocationController {
 
     @Operation(summary = "更新配送员位置信息到缓存  位置同显")
     @PowerLogin
-    @PostMapping("/updateDriverLocationToCache")
+    @PostMapping("/updateOrderLocationToCache")
     public Result<Boolean> updateDriverLocationToCache(@RequestBody UpdateOrderLocationForm updateOrderLocationForm) {
         return Result.ok(locationService.updateOrderLocationToCache(updateOrderLocationForm));
     }
