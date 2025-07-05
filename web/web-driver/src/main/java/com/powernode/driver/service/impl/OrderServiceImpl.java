@@ -1,8 +1,10 @@
 package com.powernode.driver.service.impl;
 
 
+import com.powernode.common.constant.SystemConstant;
 import com.powernode.common.execption.PowerException;
 import com.powernode.common.result.ResultCodeEnum;
+import com.powernode.common.util.LocationUtil;
 import com.powernode.dispatch.client.NewOrderFeignClient;
 import com.powernode.driver.service.OrderService;
 import com.powernode.map.client.LocationFeignClient;
@@ -17,6 +19,8 @@ import com.powernode.model.form.rules.FeeRuleRequestForm;
 import com.powernode.model.form.rules.ProfitsharingRuleRequestForm;
 import com.powernode.model.form.rules.RewardRuleRequestForm;
 import com.powernode.model.vo.map.DrivingLineVo;
+import com.powernode.model.vo.map.OrderLocationVo;
+import com.powernode.model.vo.map.OrderServiceLastLocationVo;
 import com.powernode.model.vo.order.CurrentOrderInfoVo;
 import com.powernode.model.vo.order.NewOrderDataVo;
 import com.powernode.model.vo.order.OrderInfoVo;
@@ -140,6 +144,20 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Boolean driverArriveStartLocation(Long orderId, Long driverId) {
+        //判断是否有刷单
+        OrderInfo orderInfo = orderInfoFeignClient.getOrderInfo(orderId).getData();
+
+        OrderLocationVo orderLocationVo = locationFeignClient.getCacheOrderLocation(orderId).getData();
+
+        //判断订单起始位置和配送员的位置的距离
+        double distance = LocationUtil.getDistance(orderInfo.getStartPointLatitude().doubleValue(), orderInfo.getStartPointLongitude().doubleValue(),
+                orderLocationVo.getLatitude().doubleValue(), orderLocationVo.getLongitude().doubleValue());
+
+        if (distance > SystemConstant.DRIVER_START_LOCATION_DISTION){
+            throw new PowerException(ResultCodeEnum.DRIVER_START_LOCATION_DISTION_ERROR);
+        }
+
+
         return orderInfoFeignClient.driverArriveStartLocation(orderId, driverId).getData();
     }
 
@@ -160,6 +178,13 @@ public class OrderServiceImpl implements OrderService {
         if (orderInfo.getDriverId().longValue() != orderFeeForm.getDriverId().longValue()) {
             throw new PowerException(ResultCodeEnum.ILLEGAL_REQUEST);
         }
+
+        //防止配送员未到达结束位置提前点结束
+        OrderServiceLastLocationVo orderServiceLastLocationVo = locationFeignClient.getOrderServiceLastLocation(orderFeeForm.getOrderId()).getData();
+        double distance = LocationUtil.getDistance(orderInfo.getEndPointLatitude().doubleValue(), orderInfo.getEndPointLongitude().doubleValue(), orderServiceLastLocationVo.getLatitude().doubleValue(), orderServiceLastLocationVo.getLongitude().doubleValue());
+//        if(distance > SystemConstant.DRIVER_START_LOCATION_DISTION) {
+//            throw new PowerException(ResultCodeEnum.DRIVER_END_LOCATION_DISTION_ERROR);
+//        }
 
         //2.计算实际里程
         BigDecimal realDistance = locationFeignClient.calculateOrderRealDistance(orderInfo.getId()).getData();

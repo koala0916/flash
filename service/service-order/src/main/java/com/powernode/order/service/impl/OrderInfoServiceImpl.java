@@ -421,7 +421,7 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
             //计算分账
             OrderProfitsharing orderProfitsharing = new OrderProfitsharing();
             BeanUtils.copyProperties(updateOrderBillForm, orderProfitsharing);
-            orderProfitsharing.setRuleId(updateOrderBillForm.getProfitsharingRuleId());
+            orderProfitsharing.setRuleId(1L);
             orderProfitsharing.setStatus(1);
             orderProfitsharingMapper.insert(orderProfitsharing);
 

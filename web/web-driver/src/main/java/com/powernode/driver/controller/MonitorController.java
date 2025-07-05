@@ -22,7 +22,7 @@ public class MonitorController {
 
     @Operation(summary = "上传监控信息")
     @PostMapping(value = "/upload")
-    public Result<Boolean> upload(@RequestParam("file") MultipartFile file, @RequestBody OrderMonitorForm orderMonitorForm) {
+    public Result<Boolean> upload(@RequestParam("file") MultipartFile file, OrderMonitorForm orderMonitorForm) {
         return Result.ok(monitorService.upload(file, orderMonitorForm));
     }
 }
