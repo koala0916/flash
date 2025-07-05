@@ -6,15 +6,16 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.powernode.common.constant.RedisConstant;
 import com.powernode.common.execption.PowerException;
 import com.powernode.common.result.ResultCodeEnum;
-import com.powernode.model.entity.order.OrderInfo;
-import com.powernode.model.entity.order.OrderMonitor;
-import com.powernode.model.entity.order.OrderStatusLog;
+import com.powernode.model.entity.order.*;
 import com.powernode.model.enums.OrderStatus;
 import com.powernode.model.form.order.OrderInfoForm;
 import com.powernode.model.form.order.StartDriveForm;
+import com.powernode.model.form.order.UpdateOrderBillForm;
 import com.powernode.model.form.order.UpdateOrderCartForm;
 import com.powernode.model.vo.order.CurrentOrderInfoVo;
+import com.powernode.order.mapper.OrderBillMapper;
 import com.powernode.order.mapper.OrderInfoMapper;
+import com.powernode.order.mapper.OrderProfitsharingMapper;
 import com.powernode.order.mapper.OrderStatusLogMapper;
 import com.powernode.order.service.OrderInfoService;
 import com.powernode.order.service.OrderMonitorService;
@@ -49,6 +50,11 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
     @Resource
     private OrderMonitorService orderMonitorService;
 
+    @Resource
+    private OrderBillMapper orderBillMapper;
+
+    @Resource
+    private OrderProfitsharingMapper orderProfitsharingMapper;
 
     /**
      * 用户下订单
@@ -379,5 +385,49 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
         Long count = orderInfoMapper.selectCount(queryWrapper);
 
         return count;
+    }
+
+
+    /**
+     * 结束配送
+     */
+    @Transactional
+    @Override
+    public Boolean endDrive(UpdateOrderBillForm updateOrderBillForm) {
+        //修改订单信息
+        LambdaQueryWrapper<OrderInfo> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(OrderInfo::getId, updateOrderBillForm.getOrderId());
+        queryWrapper.eq(OrderInfo::getDriverId, updateOrderBillForm.getDriverId());
+
+        OrderInfo updateOrderInfo = new OrderInfo();
+        //更新
+        updateOrderInfo.setStatus(OrderStatus.END_SERVICE.getStatus());
+        updateOrderInfo.setRealAmount(updateOrderBillForm.getTotalAmount());//实际金额
+        updateOrderInfo.setRealDistance(updateOrderBillForm.getRealDistance());
+        updateOrderInfo.setFavourFee(updateOrderBillForm.getFavourFee());
+        updateOrderInfo.setEndServiceTime(new Date());
+
+        int num = orderInfoMapper.update(updateOrderInfo, queryWrapper);
+        if (num == 1){
+            //记录日志 这里省略
+
+            //计算账单
+            OrderBill orderBill = new OrderBill();
+            BeanUtils.copyProperties(updateOrderBillForm, orderBill);
+            orderBill.setPayAmount(orderBill.getTotalAmount());
+
+            orderBillMapper.insert(orderBill);
+
+            //计算分账
+            OrderProfitsharing orderProfitsharing = new OrderProfitsharing();
+            BeanUtils.copyProperties(updateOrderBillForm, orderProfitsharing);
+            orderProfitsharing.setRuleId(updateOrderBillForm.getProfitsharingRuleId());
+            orderProfitsharing.setStatus(1);
+            orderProfitsharingMapper.insert(orderProfitsharing);
+
+        }else {
+            throw new PowerException(ResultCodeEnum.UPDATE_ERROR);
+        }
+        return true;
     }
 }

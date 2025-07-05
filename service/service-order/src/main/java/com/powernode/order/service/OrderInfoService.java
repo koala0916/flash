@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.powernode.model.entity.order.OrderInfo;
 import com.powernode.model.form.order.OrderInfoForm;
 import com.powernode.model.form.order.StartDriveForm;
+import com.powernode.model.form.order.UpdateOrderBillForm;
 import com.powernode.model.form.order.UpdateOrderCartForm;
 import com.powernode.model.vo.order.CurrentOrderInfoVo;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,4 +32,6 @@ public interface OrderInfoService extends IService<OrderInfo> {
     Boolean driverArriveStartLocation(Long orderId, Long driverId);
 
     Long getOrderNumByTime(String startTime, String endTime);
+
+    Boolean endDrive(UpdateOrderBillForm updateOrderBillForm);
 }

@@ -4,6 +4,7 @@ import com.powernode.common.result.Result;
 import com.powernode.model.entity.order.OrderInfo;
 import com.powernode.model.form.order.OrderInfoForm;
 import com.powernode.model.form.order.StartDriveForm;
+import com.powernode.model.form.order.UpdateOrderBillForm;
 import com.powernode.model.form.order.UpdateOrderCartForm;
 import com.powernode.model.vo.order.CurrentOrderInfoVo;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -52,4 +53,8 @@ public interface OrderInfoFeignClient {
 
     @GetMapping("/order/info/getOrderNumByTime/{startTime}/{endTime}")
     Result<Long> getOrderNumByTime(@PathVariable String startTime, @PathVariable String endTime);
+
+
+    @PostMapping("/order/info/endDrive")
+    Result<Boolean> endDrive(@RequestBody UpdateOrderBillForm updateOrderBillForm);
 }
