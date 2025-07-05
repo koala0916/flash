@@ -4,6 +4,7 @@ package com.powernode.map.service.impl;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.powernode.common.constant.RedisConstant;
 import com.powernode.common.constant.SystemConstant;
+import com.powernode.common.util.LocationUtil;
 import com.powernode.driver.client.DriverInfoFeignClient;
 import com.powernode.map.repository.OrderServiceLocationRepository;
 import com.powernode.map.service.LocationService;
@@ -16,10 +17,12 @@ import com.powernode.model.form.map.UpdateOrderLocationForm;
 import com.powernode.model.vo.map.NearByDriverVo;
 import com.powernode.model.vo.map.OrderLocationVo;
 import com.powernode.model.vo.map.OrderServiceLastLocationVo;
+import com.powernode.order.client.OrderInfoFeignClient;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.geo.*;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -51,6 +54,8 @@ public class LocationServiceImpl implements LocationService {
 
     @Resource
     private MongoTemplate mongoTemplate;
+    @Autowired
+    private OrderInfoFeignClient orderInfoFeignClient;
 
     /**
      * 将配送员的位置信息存储到redis数据库中
@@ -62,7 +67,7 @@ public class LocationServiceImpl implements LocationService {
         Point point = new Point(updateDriverLocationForm.getLongitude().doubleValue(), updateDriverLocationForm.getLatitude().doubleValue());
 
         //这里使用的是opsForGeo
-        redisTemplate.opsForGeo().add(RedisConstant.DRIVER_GEO_LOCATION,point, updateDriverLocationForm.getDriverId()+"");
+        redisTemplate.opsForGeo().add(RedisConstant.DRIVER_GEO_LOCATION, point, updateDriverLocationForm.getDriverId() + "");
 
         return true;
     }
@@ -110,7 +115,7 @@ public class LocationServiceImpl implements LocationService {
         //保存符合派单条件的配送员
         List<NearByDriverVo> list = new ArrayList<>();
 
-        if (CollectionUtils.isNotEmpty(content)){
+        if (CollectionUtils.isNotEmpty(content)) {
             Iterator<GeoResult<RedisGeoCommands.GeoLocation<String>>> iterator = content.iterator();
 
             while (iterator.hasNext()) {
@@ -146,6 +151,7 @@ public class LocationServiceImpl implements LocationService {
 
     /**
      * 位置同显 更新配送员位置信息
+     *
      * @param updateOrderLocationForm
      * @return
      */
@@ -156,7 +162,7 @@ public class LocationServiceImpl implements LocationService {
         orderLocationVo.setLongitude(updateOrderLocationForm.getLongitude());
 
         //将位置数据放入redis
-        redisTemplate.opsForValue().set(RedisConstant.UPDATE_ORDER_LOCATION+updateOrderLocationForm.getOrderId(), orderLocationVo);
+        redisTemplate.opsForValue().set(RedisConstant.UPDATE_ORDER_LOCATION + updateOrderLocationForm.getOrderId(), orderLocationVo);
 
         return true;
     }
@@ -167,7 +173,7 @@ public class LocationServiceImpl implements LocationService {
      */
     @Override
     public OrderLocationVo getCacheOrderLocation(Long orderId) {
-        return (OrderLocationVo) redisTemplate.opsForValue().get(RedisConstant.UPDATE_ORDER_LOCATION+orderId);
+        return (OrderLocationVo) redisTemplate.opsForValue().get(RedisConstant.UPDATE_ORDER_LOCATION + orderId);
     }
 
     /**
@@ -178,7 +184,7 @@ public class LocationServiceImpl implements LocationService {
         //将前端传入的类型转成实体entity OrderServiceLocation
         List<OrderServiceLocation> list = new ArrayList<>();
 
-        orderServiceLocationForms.forEach(form ->{
+        orderServiceLocationForms.forEach(form -> {
             OrderServiceLocation orderServiceLocation = new OrderServiceLocation();
 
             BeanUtils.copyProperties(form, orderServiceLocation);
@@ -213,5 +219,39 @@ public class LocationServiceImpl implements LocationService {
         BeanUtils.copyProperties(orderServiceLocation, orderServiceLastLocationVo);
 
         return orderServiceLastLocationVo;
+    }
+
+    /**
+     * 计算实际距离
+     */
+    @Override
+    public BigDecimal calculateOrderRealDistance(Long orderId) {
+        //从mongodb中查询标点串
+        List<OrderServiceLocation> orderServiceLocationList = orderServiceLocationRepository.findByOrderIdOrderByCreateTimeAsc(orderId);
+
+        //最终实际距离
+        double realDistance = 0;
+
+        if (CollectionUtils.isNotEmpty(orderServiceLocationList)) {
+            //遍历标点穿list获取坐标
+            for (int i = 0, size = orderServiceLocationList.size() - 1; i < size; i++) {
+                //上一个位置信息
+                OrderServiceLocation start = orderServiceLocationList.get(i);
+                //下一个位置信息
+                OrderServiceLocation end = orderServiceLocationList.get(i + 1);
+
+                //利用工具类计算上面两个位置的距离
+                double distance = LocationUtil.getDistance(start.getLatitude().doubleValue(), start.getLongitude().doubleValue(), end.getLatitude().doubleValue(), end.getLongitude().doubleValue());
+
+                realDistance += distance;
+            }
+        }
+
+        //我们在模拟器中无法移动，所以这里模拟了一个距离
+        if (realDistance == 0) {
+            return orderInfoFeignClient.getOrderInfo(orderId).getData().getExpectDistance().add(new BigDecimal(1));
+        }
+
+        return new BigDecimal(realDistance);
     }
 }
