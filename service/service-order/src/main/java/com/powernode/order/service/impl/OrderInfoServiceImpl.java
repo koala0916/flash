@@ -365,4 +365,19 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
         }
         return true;
     }
+
+
+    /**
+     * 获取配送员时间段之内配送的订单数
+     */
+    @Override
+    public Long getOrderNumByTime(String startTime, String endTime) {
+        LambdaQueryWrapper<OrderInfo> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.ge(OrderInfo::getStartServiceTime, startTime);
+        queryWrapper.le(OrderInfo::getStartServiceTime, endTime);
+        //获取配送员时间段之内配送的订单数
+        Long count = orderInfoMapper.selectCount(queryWrapper);
+
+        return count;
+    }
 }

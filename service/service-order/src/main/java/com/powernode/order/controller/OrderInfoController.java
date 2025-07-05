@@ -91,5 +91,12 @@ public class OrderInfoController {
     public Result<Boolean> driverArriveStartLocation(@PathVariable Long orderId, @PathVariable Long driverId) {
         return Result.ok(orderInfoService.driverArriveStartLocation(orderId, driverId));
     }
+
+
+    @Operation(summary = "获取时间段内订单数量")
+    @GetMapping("/getOrderNumByTime/{startTime}/{endTime}")
+    public Result<Long> getOrderNumByTime(@PathVariable String startTime, @PathVariable String endTime) {
+        return Result.ok(orderInfoService.getOrderNumByTime(startTime, endTime));
+    }
 }
 

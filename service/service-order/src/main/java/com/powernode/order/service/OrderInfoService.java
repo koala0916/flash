@@ -29,4 +29,6 @@ public interface OrderInfoService extends IService<OrderInfo> {
 
     @Transactional(rollbackFor = Exception.class)
     Boolean driverArriveStartLocation(Long orderId, Long driverId);
+
+    Long getOrderNumByTime(String startTime, String endTime);
 }
